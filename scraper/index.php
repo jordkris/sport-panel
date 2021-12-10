@@ -1,0 +1,351 @@
+<?php
+date_default_timezone_set("Asia/Jakarta");
+set_time_limit(0);
+require '../vendor/simple_html_dom/simple_html_dom.php';
+
+$GLOBALS['sportData'] = [
+    "boys,baseball" => "Boys Baseball",
+    "boys,basketball" => "Boys Basketball",
+    "boys,football" => "Boys Football",
+    "boys,lacrosse" => "Boys Lacrosse",
+    "boys,soccer" => "Boys Soccer",
+    "boys,trackfield" => "Boys Track & Field",
+    "girls,basketball" => "Girls Basketball",
+    "girls,lacrosse" => "Girls Lacrosse",
+    "girls,soccer" => "Girls Soccer",
+    "girls,softball" => "Girls Softball",
+    "girls,trackfield" => "Girls Track & Field",
+    "girls,volleyball" => "Girls Volleyball",
+    "boys,badminton" => "Boys Badminton",
+    "boys,baseball" => "Boys Baseball",
+    "boys,basketball" => "Boys Basketball",
+    "boys,bowling" => "Boys Bowling",
+    "boys,crosscountry" => "Boys Cross Country",
+    "boys,flagfootball" => "Boys Flag Football",
+    "boys,football" => "Boys Football",
+    "boys,golf" => "Boys Golf",
+    "boys,icehockey" => "Boys Ice Hockey",
+    "boys,indoortrackfield" => "Boys Indoor Track & Field",
+    "boys,lacrosse" => "Boys Lacrosse",
+    "boys,rugby" => "Boys Rugby",
+    "boys,skisnowboard" => "Boys Ski & Snowboard",
+    "boys,soccer" => "Boys Soccer",
+    "boys,swimming" => "Boys Swimming",
+    "boys,tennis" => "Boys Tennis",
+    "boys,trackfield" => "Boys Track & Field",
+    "boys,volleyball" => "Boys Volleyball",
+    "boys,waterpolo" => "Boys Water Polo",
+    "boys,weightlifting" => "Boys Weight Lifting",
+    "boys,wrestling" => "Boys Wrestling",
+    "co-ed,cheer" => "Co-ed Cheer",
+    "co-ed,danceteam" => "Co-ed Dance Team",
+    "co-ed,drill" => "Co-ed Drill",
+    "co-ed,speech" => "Co-ed Speech",
+    "girls,basketball" => "Girls Basketball",
+    "girls,bowling" => "Girls Bowling",
+    "girls,crosscountry" => "Girls Cross Country",
+    "girls,fieldhockey" => "Girls Field Hockey",
+    "girls,flagfootball" => "Girls Flag Football",
+    "girls,golf" => "Girls Golf",
+    "girls,gymnastics" => "Girls Gymnastics",
+    "girls,icehockey" => "Girls Ice Hockey",
+    "girls,indoortrackfield" => "Girls Indoor Track & Field",
+    "girls,lacrosse" => "Girls Lacrosse",
+    "girls,skisnowboard" => "Girls Ski & Snowboard",
+    "girls,slowpitchsoftball" => "Girls Slow Pitch Softball",
+    "girls,soccer" => "Girls Soccer",
+    "girls,softball" => "Girls Softball",
+    "girls,swimming" => "Girls Swimming",
+    "girls,tennis" => "Girls Tennis",
+    "girls,trackfield" => "Girls Track & Field",
+    "girls,volleyball" => "Girls Volleyball",
+    "girls,waterpolo" => "Girls Water Polo",
+    "girls,weightlifting" => "Girls Weight Lifting"
+];
+
+$GLOBALS['stateData'] = [
+    "AL" => "Alabama",
+    "AK" => "Alaska",
+    "AZ" => "Arizona",
+    "AR" => "Arkansas",
+    "CA" => "California",
+    "CO" => "Colorado",
+    "CT" => "Connecticut",
+    "DE" => "Delaware",
+    "FL" => "Florida",
+    "GA" => "Georgia",
+    "HI" => "Hawaii",
+    "ID" => "Idaho",
+    "IL" => "Illinois",
+    "IN" => "Indiana",
+    "IA" => "Iowa",
+    "KS" => "Kansas",
+    "KY" => "Kentucky",
+    "LA" => "Louisiana",
+    "ME" => "Maine",
+    "MD" => "Maryland",
+    "MA" => "Massachusetts",
+    "" => "Mexico",
+    "MI" => "Michigan",
+    "MN" => "Minnesota",
+    "MS" => "Mississippi",
+    "MO" => "Missouri",
+    "MT" => "Montana",
+    "NE" => "Nebraska",
+    "NV" => "Nevada",
+    "NH" => "New Hampshire",
+    "NJ" => "New Jersey",
+    "NM" => "New Mexico",
+    "NY" => "New York",
+    "NC" => "North Carolina",
+    "ND" => "North Dakota",
+    "OH" => "Ohio",
+    "OK" => "Oklahoma",
+    "OR" => "Oregon",
+    "PA" => "Pennsylvania",
+    "PS" => "Prep Schools",
+    "RI" => "Rhode Island",
+    "SC" => "South Carolina",
+    "SD" => "South Dakota",
+    "TN" => "Tennessee",
+    "TX" => "Texas",
+    "UT" => "Utah",
+    "VT" => "Vermont",
+    "VA" => "Virginia",
+    "WA" => "Washington",
+    "DC" => "Washington, DC",
+    "WV" => "West Virginia",
+    "WI" => "Wisconsin",
+    "WY" => "Wyoming"
+];
+
+function getParam($param)
+{
+    if (isset($_GET[$param])) {
+        return $_GET[$param];
+    } else {
+        throw new Exception('Please provide a ' . $param . ' parameter!');
+    }
+}
+
+function isContains($string, $substring)
+{
+    if (strpos($string, $substring) !== false) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isTrueDate($date)
+{
+    $dateArr = explode('/', $date);
+    if (count($dateArr) == 3) {
+        $month = $dateArr[0];
+        $day = $dateArr[1];
+        $year = $dateArr[2];
+        if (checkdate($month, $day, $year)) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+function trimZeroPrefixDate($date)
+{
+    $dateArr = explode('/', $date);
+    return implode('/', [ltrim($dateArr[0], '0'), ltrim($dateArr[1], '0'), $dateArr[2]]);
+}
+
+function isTrueGenderSport($genderSport)
+{
+    return isset($GLOBALS['sportData'][$genderSport]);
+}
+
+function isTrueState($state)
+{
+    return isset($GLOBALS['stateData'][$state]);
+}
+
+function dateToText($date)
+{
+    $dateArr = explode('/', $date);
+    $year = $dateArr[2];
+    $month = $dateArr[0] < 10 ? '0' . $dateArr[0] : $dateArr[0];
+    $day = $dateArr[1] < 10 ? '0' . $dateArr[1] : $dateArr[1];
+    return date("M jS, Y", strtotime(implode('-', [$year, $month, $day])));
+}
+
+function prt($string)
+{
+    echo $string . PHP_EOL;
+}
+
+// $runtime = new Runtime();
+
+// $future = $runtime->run(function(){
+//     for ($i = 0; $i < 20; $i++)
+//         echo "*";
+
+//     return "easy";
+// });
+
+// function test1()
+// {
+//     $res = [];
+//     for ($i = 0; $i < 5; $i++) {
+//         echo ".";
+//         $res[] = $i.'.';
+//     }
+//     return $res;
+// }
+// function test2()
+// {
+//     $res = [];
+//     for ($i = 0; $i < 5; $i++) {
+//         echo "*";
+//         $res[] = $i.'*';
+//     }
+//     return $res;
+// }
+// $testAll = Promise\all([test1(), test2()]);
+// $testAll->then(function ($res) { 
+//    print_r($res);
+// });
+
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    $GLOBALS['currentError'] = $errstr;
+});
+
+function getScheduleUrl($i, $document)
+{
+    $singleRes = new stdClass();
+    $contest = $document->find('[data-teams]', $i)->find('.teams > li > .name');
+    $linkData = $document->find('[data-teams]', $i)->find('a.c-c');
+    $link =  $linkData != [] ? $linkData : 'link not found';
+    if (!($link == 'link not found')) {
+        $link = $linkData[0]->href;
+    }
+    if (count($contest) == 2) {
+        $home = html_entity_decode(trim($contest[0]->text()));
+        $away = html_entity_decode(trim($contest[1]->text()));
+        if (!(strtolower($home) == 'tba' || strtolower($away) == 'tba')) {
+            $singleRes->index = $i;
+            $singleRes->url = $link;
+            return $singleRes;
+        }
+    }
+    return new stdClass();
+}
+
+function getSingleScheduleData($i, $document, $date, $genderSport, $state, $url)
+{
+    $singleRes = new stdClass();
+    $contest = $document->find('[data-teams]', $i)->find('.teams > li > .name');
+    if (count($contest) == 2) {
+        $singleRes->home = html_entity_decode(trim($contest[0]->text()));
+        $singleRes->away = html_entity_decode(trim($contest[1]->text()));
+        if (!(strtolower($singleRes->home) == 'tba' || strtolower($singleRes->away) == 'tba')) {
+            $singleRes->description = html_entity_decode(file_get_html($url)->find('p.contest-description', 0)->text());
+            $singleRes->date = dateToText($date);
+            $singleRes->genderSport = $GLOBALS['sportData'][$genderSport];
+            $singleRes->state = $GLOBALS['stateData'][$state];
+            $singleRes->url = $url;
+            return $singleRes;
+        }
+    }
+    return new stdClass();
+}
+$GLOBALS['result'] = new stdClass();
+$GLOBALS['result']->status = 500;
+$GLOBALS['result']->message = 'Internal server error';
+$GLOBALS['result']->elapsedTime = microtime(true);
+$GLOBALS['result']->source = '';
+$GLOBALS['result']->total = 0;
+$GLOBALS['result']->data = [];
+try {
+    $date = getParam('date');
+    $genderSport = strtolower(getParam('gendersport'));
+    $state = strtoupper(getParam('state'));
+
+    if (isTrueDate($date)) {
+        $date = trimZeroPrefixDate($date);
+    } else {
+        throw new Exception('Invalid date. date parameter must be MM/DD/YYYY!');
+    }
+    if (!isTrueGenderSport($genderSport)) {
+        throw new Exception('Invalid gender sport. genderSport parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['sportData'])) . ']');
+    }
+    if (!isTrueState($state)) {
+        throw new Exception('Invalid state. state parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['stateData'])) . ']');
+    }
+    $url = 'https://www.maxpreps.com/list/schedules_scores.aspx?date=' . $date . '&gendersport=' . $genderSport . '&state=' . $state;
+    $document = file_get_html($url);
+    $availableDate = [];
+    foreach ($document->find('.month li > a') as $element) {
+        $filterData = explode('&', explode('?', $element->href)[1]);
+        $availableDate[] = explode('=', $filterData[0])[1];
+    }
+    if (in_array($date, $availableDate)) {
+        if (!(count($document->find('.no-data')) > 0)) {
+            $teams = $document->find('[data-teams]');
+            if (count($teams) > 0) {
+                $cup = trim($document->find('header h1', 0)->text());
+                if (isContains($cup, 'Schedule')) {
+                    $cup = str_replace('Schedule', '', $cup);
+                }
+
+                if (isset($_GET['index']) && isset($_GET['url'])) {
+                    $GLOBALS['result']->total = 1;
+                    $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $genderSport, $state, $_GET['url']);
+                } else {
+                    $res = [];
+                    for ($i = 0; $i < count($teams); $i++) {
+                        $res[] = getScheduleUrl($i, $document, $date, $genderSport, $state);
+                    }
+                    $GLOBALS['result']->data = array_filter($res, function ($val) {
+                        return $val != new stdClass();
+                    });;
+                }
+                $GLOBALS['result']->status = 200;
+                $GLOBALS['result']->source = $url;
+                $GLOBALS['result']->message = 'Successfully load data';
+            } else {
+                $GLOBALS['result']->message = 'No teams found';
+            }
+        } else {
+            $GLOBALS['result']->message = 'No cup available';
+        }
+    } else {
+        $GLOBALS['result']->message = 'No schedules available';
+    }
+} catch (Exception $e) {
+    $GLOBALS['result']->message = $e->getMessage();
+    if (isset($GLOBALS['currentError'])) {
+        $GLOBALS['result']->message .= ', ' . $GLOBALS['currentError'];
+    }
+} catch (Error $e) {
+    $GLOBALS['result']->message = $e->getMessage();
+} finally {
+    restore_error_handler();
+    $GLOBALS['result']->elapsedTime = round(microtime(true) - $GLOBALS['result']->elapsedTime, 3) . ' s';
+    if (!isset($_GET['index']) || !isset($_GET['url'])) $GLOBALS['result']->total = count($GLOBALS['result']->data);
+    header('Content-Type: application/json');
+    echo json_encode($GLOBALS['result'], JSON_PRETTY_PRINT);
+}
+// ------------------------ example ----------------------------------
+// foreach ($document->find('img') as $element) {
+//     echo '<img src="//'.join_paths($shortUrl, $element->src).'" /><br />';
+// }
+// Find all images
+
+// print_r($document->find('img'));
+// foreach ($document->find('img') as $element) {
+//     echo join_paths($url, $element->src) . '<br />';
+// }
+// Find all links
+// foreach($document->find('a') as $element)
+//        echo $element->href . '<br>';
