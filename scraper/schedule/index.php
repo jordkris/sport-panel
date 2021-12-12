@@ -1,10 +1,10 @@
 <?php
 date_default_timezone_set("Asia/Jakarta");
 set_time_limit(0);
-require '../vendor/simple_html_dom/simple_html_dom.php';
+require '../../vendor/simple_html_dom/simple_html_dom.php';
 
-$GLOBALS['sportData'] = json_decode(file_get_contents('sportData.json'),true);
-$GLOBALS['stateData'] = json_decode(file_get_contents('stateData.json'),true);
+$GLOBALS['sportData'] = json_decode(file_get_contents('../../sportData.json'),true);
+$GLOBALS['stateData'] = json_decode(file_get_contents('../../stateData.json'),true);
 
 function getParam($param)
 {
@@ -71,38 +71,6 @@ function prt($string)
     echo $string . PHP_EOL;
 }
 
-// $runtime = new Runtime();
-
-// $future = $runtime->run(function(){
-//     for ($i = 0; $i < 20; $i++)
-//         echo "*";
-
-//     return "easy";
-// });
-
-// function test1()
-// {
-//     $res = [];
-//     for ($i = 0; $i < 5; $i++) {
-//         echo ".";
-//         $res[] = $i.'.';
-//     }
-//     return $res;
-// }
-// function test2()
-// {
-//     $res = [];
-//     for ($i = 0; $i < 5; $i++) {
-//         echo "*";
-//         $res[] = $i.'*';
-//     }
-//     return $res;
-// }
-// $testAll = Promise\all([test1(), test2()]);
-// $testAll->then(function ($res) { 
-//    print_r($res);
-// });
-
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     $GLOBALS['currentError'] = $errstr;
 });
@@ -155,7 +123,7 @@ $GLOBALS['result']->total = 0;
 $GLOBALS['result']->data = [];
 try {
     $date = getParam('date');
-    $genderSport = strtolower(getParam('gendersport'));
+    $genderSport = strtolower(getParam('genderSport'));
     $state = strtoupper(getParam('state'));
 
     if (isTrueDate($date)) {
@@ -195,7 +163,7 @@ try {
                     }
                     $GLOBALS['result']->data = array_filter($res, function ($val) {
                         return $val != new stdClass();
-                    });;
+                    });
                 }
                 $GLOBALS['result']->status = 200;
                 $GLOBALS['result']->source = $url;
@@ -223,16 +191,3 @@ try {
     header('Content-Type: application/json');
     echo json_encode($GLOBALS['result'], JSON_PRETTY_PRINT);
 }
-// ------------------------ example ----------------------------------
-// foreach ($document->find('img') as $element) {
-//     echo '<img src="//'.join_paths($shortUrl, $element->src).'" /><br />';
-// }
-// Find all images
-
-// print_r($document->find('img'));
-// foreach ($document->find('img') as $element) {
-//     echo join_paths($url, $element->src) . '<br />';
-// }
-// Find all links
-// foreach($document->find('a') as $element)
-//        echo $element->href . '<br>';
