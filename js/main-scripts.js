@@ -246,7 +246,7 @@ async function loadSchedule(date, gendersport, state) {
                 try {
                     let tasks = [],
                         val;
-                    let thread = 10;
+                    let thread = 5;
                     for (let i = 0; i < res.data.length; i++) {
                         val = res.data[i];
                         console.log(val, i);
