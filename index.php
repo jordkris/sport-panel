@@ -85,12 +85,22 @@
 								</a>
 							</li>
 						<?php } ?>
-						<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li></li>
-								<li><a href="#">Page 1-1<div class="dropdown-divider"></div>haha</a></li>
-								<li><a href="#">Page 1-2</a></li>
-								<li><a href="#">Page 1-3</a></li>
+						<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">More <span class="caret"></span></a>
+							<ul class="dropdown-menu" id="more-menu">
+								<?php
+								$url = '?';
+								$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : '';
+								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
+								$counter = 0;
+								foreach ($topbar as $t) {
+									$link = $url . 'genderSport=' . $t;
+								?>
+									<li>
+										<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
+											<span class="icon fa fa-play-circle-o"></span><?= $sportData[$t]; ?>
+										</a>
+									</li>
+								<?php } ?>
 							</ul>
 						</li>
 					</ul>
@@ -108,7 +118,7 @@
 			</div>
 			<div class="container">
 				<div id="video" class="text-center">
-					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;" class="img-sport" />
+					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;height: 800px;" class="img-sport" />
 				</div>
 			</div>
 			<center>
