@@ -27,7 +27,7 @@ $GLOBALS['result']->status = 500;
 $GLOBALS['result']->message = 'Internal server error';
 $GLOBALS['result']->elapsedTime = microtime(true);
 $GLOBALS['result']->image = '';
-$GLOBALS['result']->homeImage = '';
+$GLOBALS['result']->defaultImage = '';
 try {
     $genderSport = strtolower(getParam('genderSport'));
     if (!isTrueGenderSport($genderSport)) {
@@ -102,18 +102,20 @@ try {
                 $url .= 'boys';
             }
     }
-    $GLOBALS['result']->homeImage = file_get_html('https://maxpreps.com')->find('img', 1)->src;
     $document = file_get_html($url);
-    // $s = $document->find('.bKqBtd img');
-    // foreach ($s as $elm) {
-    //     echo $elm->src . PHP_EOL;
-    // }
-    $img = $document->find('.bKqBtd img', 0)->src;
-    if ($img !== null) {
-        $GLOBALS['result']->image = $img;
-    } else {
-        $GLOBALS['result']->image = $GLOBALS['result']->homeImage;
+    echo $document;
+    die;
+    $s = $document->find('.eyClGn');
+    foreach ($s as $elm) {
+        echo $elm->innertext().PHP_EOL;
     }
+    $img = $document->find('.bKqBtd img', 0)->src;
+    if ($img) {
+        $GLOBALS['request']->image = $img;
+    } else {
+        $GLOBALS['request']->image = $document->find('.article-wrapper img', 0)->src;
+    }
+    $GLOBALS['result']->defaultImage = file_get_html('https://maxpreps.com')->find('img', 1)->src;
     $GLOBALS['result']->status = 200;
     $GLOBALS['result']->message = 'Successfully load data';
 } catch (Exception $e) {

@@ -51,16 +51,47 @@
 				<nav class="collapse navbar-collapse" id="main-navbar">
 					<ul class="nav navbar-nav navbar-right">
 						<li>
-							<a href="<?= $TOPPATH; ?>">
+							<a href="<?= $site_url; ?>">
 								<span class="icon fa fa-home">
 								</span> Home
 							</a>
 						</li>
-						<li>
-							<a href="javascript:void(0)" onclick="window.location.href='nba.php'">
-								<span class="icon fa fa-play-circle-o">
-								</span> NBA
-							</a>
+						<?php
+						$topbar = json_decode(file_get_contents('topbar.json'), true);
+						$sportData = json_decode(file_get_contents('sportData.json'), true);
+						$url = '?';
+						$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : '';
+						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
+						$counter = 0;
+						foreach ($topbar as $t) {
+							if ($counter < 5) {
+								$link = $url . 'genderSport=' . $t;
+						?>
+								<li class="top-menu <?= $counter == 0 ? 'active' : ''; ?>">
+									<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
+										<span class="icon fa fa-play-circle-o"></span><?= $sportData[$t]; ?>
+									</a>
+								</li>
+						<?php $counter++;
+							} else {
+								break;
+							}
+						} ?>
+						<?php for ($i = 0; $i < 5; $i++) { ?>
+							<li class="loading-menu" style="display:none;">
+								<a href="javascript:void(0)">
+									<span class="icon fa fa-play-circle-o"></span>
+									<span class="loading-label"></span>
+								</a>
+							</li>
+						<?php } ?>
+						<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li></li>
+								<li><a href="#">Page 1-1<div class="dropdown-divider"></div>haha</a></li>
+								<li><a href="#">Page 1-2</a></li>
+								<li><a href="#">Page 1-3</a></li>
+							</ul>
 						</li>
 					</ul>
 				</nav>
@@ -72,8 +103,12 @@
 			<span class="player-cover">
 			</span>
 			<div class="container">
+				<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" id="img-sport-left" />
+				<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" id="img-sport-right" />
+			</div>
+			<div class="container">
 				<div id="video" class="text-center">
-					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading..." style="width: 100%;" />
+					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;" class="img-sport" />
 				</div>
 			</div>
 			<center>
@@ -83,136 +118,138 @@
 			<center>
 			</center>
 		</div>
-		<div class="container" itemscope itemtype="https://schema.org/Movie">
-			<div class="row">
-				<article id="post-400710" class="post col-md-12">
-					<header class="entry-header">
-						<div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-							<meta itemprop="worstRating" content="1">
-							<meta itemprop="bestRating" content="10">
-							<meta itemprop="ratingValue" content="4.7">
-							<meta itemprop="ratingCount" content="9">
-						</div>
-					</header>
-					<div class="entry-content">
-						<div class="col-md-offset-3">
-							<h3 style="color:#fffefc"><?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?>
-							</h3>
-						</div>
-						<div class="row">
-							<div class="col-md-3 text-center hidden-xs hidden-sm">
-								<img src="https://vignette.wikia.nocookie.net/logopedia/images/a/a2/Ufc-fight-night-live.png" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster">
-								<div class="rating-star" title="6.4 out of 10 stars" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star">
-									</i>
-									<i class="fa fa-star-o">
-									</i>
-									<i class="fa fa-star-o">
-									</i>
-									<div class="movie-rating">
-										<span itemprop="ratingValue">8.4
-										</span>/
-										<span itemprop="bestRating">10
-										</span> by
-										<span itemprop="ratingCount">12.281
-										</span> users
+		<div id="description" itemscope itemtype="https://schema.org/Movie">
+			<div class="container">
+				<div class="row">
+					<article id="post-400710" class="post col-md-12">
+						<header class="entry-header">
+							<div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+								<meta itemprop="worstRating" content="1">
+								<meta itemprop="bestRating" content="10">
+								<meta itemprop="ratingValue" content="4.7">
+								<meta itemprop="ratingCount" content="9">
+							</div>
+						</header>
+						<div class="entry-content">
+							<div class="col-md-offset-3">
+								<h3 style="color:#fffefc"><?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?>
+								</h3>
+							</div>
+							<div class="row">
+								<div class="col-md-3 text-center hidden-xs hidden-sm">
+									<img id="img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster img-sport">
+									<div class="rating-star" title="6.4 out of 10 stars" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star">
+										</i>
+										<i class="fa fa-star-o">
+										</i>
+										<i class="fa fa-star-o">
+										</i>
+										<div class="movie-rating">
+											<span itemprop="ratingValue">8.4
+											</span>/
+											<span itemprop="bestRating">10
+											</span> by
+											<span itemprop="ratingCount">12.281
+											</span> users
+										</div>
 									</div>
+								</div>
+								<br>
+								<div class="col-md-9">
+									<p class="lead" itemprop="description" style="text-align: justify;">UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
+									</p>
 								</div>
 							</div>
 							<br>
-							<div class="col-md-9">
-								<p class="lead" itemprop="description" style="text-align: justify;">UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
-								</p>
-							</div>
-						</div>
-						<br>
-						<center>
-							<a href="#" onclick="window.location.href='<?php echo $site_url; ?>/register.php'" data-ajax="false">
-								<img class="img-responsive" align="center" src="https://4.bp.blogspot.com/_V78gNP_BpZg/St5riEF7kKI/AAAAAAAAABM/RWvHROnZdK8/S1600-R/UFC_BANNER1.gif">
-							</a>
-						</center>
-						<br>
-						<div class="row">
-							<div class="col-md-12">
-								<section id="external-download" style="display:block!important;visibility:visible!important;opacity:1!important">
-									<h3 class="widget-title" style="display:block!important;visibility:visible!important;opacity:1!important">
-										<span>Alternative Stream Link
-										</span>
-									</h3>
-									<a href="#" data-toggle="modal" data-target="#player-modal">
-										<div class="section-content" style="display:block!important;visibility:visible!important;opacity:1!important">
-											<ul id="ext-download" style="display:block!important;visibility:visible!important;opacity:1!important">
-												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span>
-															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Flash P2P
-														</span>
-													</span>
-													<span class="ext-right pull-right">
-														<span class="ext-speed nomobile">
-															<script type="text/javascript">
-																document.write(Math.floor(Math.random() * 3200));
-															</script> Kb/s
-														</span>
-														<span class="ext-icon label label-primary"> STREAM
-														</span>
-													</span>
-												</li>
-												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span>
-															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Castasap
-														</span>
-													</span>
-													<span class="ext-right pull-right">
-														<span class="ext-speed nomobile">
-															<script type="text/javascript">
-																document.write(Math.floor(Math.random() * 2200));
-															</script> Kb/s
-														</span>
-														<span class="ext-icon label label-primary"> STREAM
-														</span>
-													</span>
-												</li>
-												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span>
-															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Liveshare
-														</span>
-													</span>
-													<span class="ext-right pull-right">
-														<span class="ext-speed nomobile">
-															<script type="text/javascript">
-																document.write(Math.floor(Math.random() * 2200));
-															</script> Kb/s
-														</span>
-														<span class="ext-icon label label-primary"> STREAM
-														</span>
-													</span>
-												</li>
-											</ul>
-										</div>
-								</section>
+							<center>
+								<a href="#" onclick="window.location.href='<?php echo $site_url; ?>/register.php'" data-ajax="false">
+									<img class="img-responsive" align="center" src="https://4.bp.blogspot.com/_V78gNP_BpZg/St5riEF7kKI/AAAAAAAAABM/RWvHROnZdK8/S1600-R/UFC_BANNER1.gif">
 								</a>
+							</center>
+							<br>
+							<div class="row">
+								<div class="col-md-12">
+									<section id="external-download" style="display:block!important;visibility:visible!important;opacity:1!important">
+										<h3 class="widget-title" style="display:block!important;visibility:visible!important;opacity:1!important">
+											<span>Alternative Stream Link
+											</span>
+										</h3>
+										<a href="#" data-toggle="modal" data-target="#player-modal">
+											<div class="section-content" style="display:block!important;visibility:visible!important;opacity:1!important">
+												<ul id="ext-download" style="display:block!important;visibility:visible!important;opacity:1!important">
+													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+															<span>
+																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Flash P2P
+															</span>
+														</span>
+														<span class="ext-right pull-right">
+															<span class="ext-speed nomobile">
+																<script type="text/javascript">
+																	document.write(Math.floor(Math.random() * 3200));
+																</script> Kb/s
+															</span>
+															<span class="ext-icon label label-primary"> STREAM
+															</span>
+														</span>
+													</li>
+													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+															<span>
+																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Castasap
+															</span>
+														</span>
+														<span class="ext-right pull-right">
+															<span class="ext-speed nomobile">
+																<script type="text/javascript">
+																	document.write(Math.floor(Math.random() * 2200));
+																</script> Kb/s
+															</span>
+															<span class="ext-icon label label-primary"> STREAM
+															</span>
+														</span>
+													</li>
+													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+															<span>
+																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Liveshare
+															</span>
+														</span>
+														<span class="ext-right pull-right">
+															<span class="ext-speed nomobile">
+																<script type="text/javascript">
+																	document.write(Math.floor(Math.random() * 2200));
+																</script> Kb/s
+															</span>
+															<span class="ext-icon label label-primary"> STREAM
+															</span>
+														</span>
+													</li>
+												</ul>
+											</div>
+									</section>
+									</a>
+								</div>
 							</div>
 						</div>
-					</div>
+					</article>
+				</div>
 			</div>
-			</article>
 		</div>
 	</div>
 	<div id="player-modal" class="modal fade nocontext">

@@ -2,7 +2,6 @@
 require_once  __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 date_default_timezone_set("Asia/Jakarta");
 use Nesk\Puphpeteer\Puppeteer;
-use Nesk\Rialto\Data\JsFunction;
 
 class Scraper
 {
