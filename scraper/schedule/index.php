@@ -47,9 +47,9 @@ function trimZeroPrefixDate($date)
     return implode('/', [ltrim($dateArr[0], '0'), ltrim($dateArr[1], '0'), $dateArr[2]]);
 }
 
-function isTrueGenderSport($genderSport)
+function isTrueGenderSport($gendersport)
 {
-    return isset($GLOBALS['sportData'][$genderSport]);
+    return isset($GLOBALS['sportData'][$gendersport]);
 }
 
 function isTrueState($state)
@@ -96,7 +96,7 @@ function getScheduleUrl($i, $document)
     return new stdClass();
 }
 
-function getSingleScheduleData($i, $document, $date, $genderSport, $state, $url)
+function getSingleScheduleData($i, $document, $date, $gendersport, $state, $url)
 {
     $singleRes = new stdClass();
     $contest = $document->find('[data-teams]', $i)->find('.teams > li > .name');
@@ -106,7 +106,7 @@ function getSingleScheduleData($i, $document, $date, $genderSport, $state, $url)
         if (!(strtolower($singleRes->home) == 'tba' || strtolower($singleRes->away) == 'tba')) {
             $singleRes->description = html_entity_decode(file_get_html($url)->find('p.contest-description', 0)->text());
             $singleRes->date = dateToText($date);
-            $singleRes->genderSport = $GLOBALS['sportData'][$genderSport];
+            $singleRes->gendersport = $GLOBALS['sportData'][$gendersport];
             $singleRes->state = $GLOBALS['stateData'][$state];
             $singleRes->url = $url;
             return $singleRes;
@@ -123,7 +123,7 @@ $GLOBALS['result']->total = 0;
 $GLOBALS['result']->data = [];
 try {
     $date = getParam('date');
-    $genderSport = strtolower(getParam('genderSport'));
+    $gendersport = strtolower(getParam('gendersport'));
     $state = strtoupper(getParam('state'));
 
     if (isTrueDate($date)) {
@@ -131,13 +131,13 @@ try {
     } else {
         throw new Exception('Invalid date. date parameter must be MM/DD/YYYY!');
     }
-    if (!isTrueGenderSport($genderSport)) {
-        throw new Exception('Invalid gender sport. genderSport parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['sportData'])) . ']');
+    if (!isTrueGenderSport($gendersport)) {
+        throw new Exception('Invalid gender sport. gendersport parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['sportData'])) . ']');
     }
     if (!isTrueState($state)) {
         throw new Exception('Invalid state. state parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['stateData'])) . ']');
     }
-    $url = 'https://www.maxpreps.com/list/schedules_scores.aspx?date=' . $date . '&gendersport=' . $genderSport . '&state=' . $state;
+    $url = 'https://www.maxpreps.com/list/schedules_scores.aspx?date=' . $date . '&gendersport=' . $gendersport . '&state=' . $state;
     $document = file_get_html($url);
     $availableDate = [];
     foreach ($document->find('.month li > a') as $element) {
@@ -155,15 +155,16 @@ try {
 
                 if (isset($_GET['index']) && isset($_GET['url'])) {
                     $GLOBALS['result']->total = 1;
-                    $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $genderSport, $state, $_GET['url']);
+                    $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $gendersport, $state, $_GET['url']);
                 } else {
                     $res = [];
                     for ($i = 0; $i < count($teams); $i++) {
-                        $res[] = getScheduleUrl($i, $document, $date, $genderSport, $state);
+                        array_push($res, getScheduleUrl($i, $document, $date, $gendersport, $state));
                     }
-                    $GLOBALS['result']->data = array_filter($res, function ($val) {
+                    $GLOBALS['result']->data = array_values(array_filter($res, function ($val) {
                         return $val != new stdClass();
-                    });
+                    }));
+                    // $GLOBALS['result']->data = $res;
                 }
                 $GLOBALS['result']->status = 200;
                 $GLOBALS['result']->source = $url;

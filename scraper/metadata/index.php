@@ -12,9 +12,9 @@ function getParam($param)
         throw new Exception('Please provide a ' . $param . ' parameter!');
     }
 }
-function isTrueGenderSport($genderSport)
+function isTrueGenderSport($gendersport)
 {
-    return isset($GLOBALS['sportData'][$genderSport]);
+    return isset($GLOBALS['sportData'][$gendersport]);
 }
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
@@ -29,12 +29,12 @@ $GLOBALS['result']->elapsedTime = microtime(true);
 $GLOBALS['result']->image = '';
 $GLOBALS['result']->homeImage = '';
 try {
-    $genderSport = strtolower(getParam('genderSport'));
-    if (!isTrueGenderSport($genderSport)) {
+    $gendersport = strtolower(getParam('gendersport'));
+    if (!isTrueGenderSport($gendersport)) {
         throw new Exception('Invalid gender sport!');
     }
-    $gender = explode(',', $genderSport)[0];
-    $sport = explode(',', $genderSport)[1];
+    $gender = explode(',', $gendersport)[0];
+    $sport = explode(',', $gendersport)[1];
     $url = 'https://www.maxpreps.com/';
     switch ($sport) {
         case 'crosscountry':

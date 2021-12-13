@@ -31,6 +31,8 @@
 	<link rel="stylesheet" id="awesome-css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="simple-css" href="//cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="google-font" href="//fonts.googleapis.com/css?family=Oswald|Open+Sans" type="text/css" media="all">
+	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
+
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/style.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/comments.css" type="text/css" media="all">
 	<link rel="shortcut icon" href="/img/favicon.gif">
@@ -65,7 +67,7 @@
 						$counter = 0;
 						foreach ($topbar as $t) {
 							if ($counter < 5) {
-								$link = $url . 'genderSport=' . $t;
+								$link = $url . 'gendersport=' . $t;
 						?>
 								<li class="top-menu <?= $counter == 0 ? 'active' : ''; ?>">
 									<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
@@ -93,7 +95,7 @@
 								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
 								$counter = 0;
 								foreach ($topbar as $t) {
-									$link = $url . 'genderSport=' . $t;
+									$link = $url . 'gendersport=' . $t;
 								?>
 									<li>
 										<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
@@ -118,7 +120,7 @@
 			</div>
 			<div class="container">
 				<div id="video" class="text-center">
-					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;height: 800px;" class="img-sport" />
+					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;" class="img-sport" />
 				</div>
 			</div>
 			<center>
@@ -186,11 +188,21 @@
 								</div>
 							</div>
 							<br>
-							<center>
-								<a href="#" onclick="window.location.href='<?php echo $site_url; ?>/register.php'" data-ajax="false">
-									<img class="img-responsive" align="center" src="https://4.bp.blogspot.com/_V78gNP_BpZg/St5riEF7kKI/AAAAAAAAABM/RWvHROnZdK8/S1600-R/UFC_BANNER1.gif">
-								</a>
-							</center>
+							<div class="container" style="background-color: white">
+								<table id="schedule-table" class="table display table-stripped" style="width:100%">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>Home</th>
+											<th>Away</th>
+											<th class="text-center">Description</th>
+											<th>Date</th>
+											<th>Gender Sport</th>
+											<th>State</th>
+										</tr>
+									</thead>
+								</table>
+							</div>
 							<br>
 							<div class="row">
 								<div class="col-md-12">
@@ -485,7 +497,7 @@
 						</span>
 					</span>
 					<span class="counter-value">
-						<script data-cfasync="false" src="<?php echo $site_url; ?>/assets/js/email-decode.min.js">
+						<!-- <script data-cfasync="false" src="<?php echo $site_url; ?>/assets/js/email-decode.min.js"> -->
 						</script>
 						<script type="text/javascript">
 							document.write(Math.floor(Math.random() * 12733));
@@ -495,15 +507,19 @@
 			</div>
 		</div>
 	</footer>
-	<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js" defer>
+	<script type="text/javascript" src="//code.jquery.com/jquery-2.2.0.min.js">
 	</script>
-	<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" defer>
+	<script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
 	</script>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js" defer>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/js/jasny-bootstrap.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/scripts.min.js" defer>
+	<script type="text/javascript" src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js">
 	</script>
-	<?php include('histats.php'); ?>
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/scripts.min.js">
+	</script>
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
+	</script>
+	<?php //include('histats.php'); ?>
 </body>
 
 </html>
