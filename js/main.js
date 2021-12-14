@@ -250,7 +250,7 @@ async function loadSchedule(date, gendersport, state) {
                     for (let i = 0; i < res.data.length; i++) {
                         val = res.data[i];
                         console.log(val, i);
-                        tasks.push(new Promise((resolve, reject) => {
+                        tasks.push(new Promise(async(resolve, reject) => {
                             $.ajax({
                                 url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}&index=${val.index}&url=${val.url}`,
                                 type: 'GET',
@@ -274,13 +274,13 @@ async function loadSchedule(date, gendersport, state) {
                             });
                         }));
                         if (i % thread == 0) {
-                            Promise.all(tasks).then((val) => {
+                            await Promise.all(tasks).then((val) => {
                                 console.log((i + 1) + ' tasks success!');
                             });
                             tasks = [];
                         }
                         if (i == res.data.length - 1) {
-                            Promise.all(tasks).then((val) => {
+                            await Promise.all(tasks).then((val) => {
                                 console.log((i + 1) + ' tasks success!');
                             });
                             tasks = [];
