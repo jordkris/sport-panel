@@ -241,7 +241,7 @@ async function loadSchedule(date, gendersport, state) {
     $.ajax({
         url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}`,
         type: 'GET',
-        success: (res) => {
+        success: async(res) => {
             if (res.status == 200) {
                 try {
                     let tasks = [],

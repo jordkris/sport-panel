@@ -515,7 +515,7 @@
 	</script>
 	<script type="text/javascript" src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main-script.js">
 	</script>
 	<?php //include('histats.php'); ?>
 </body>

@@ -26,6 +26,7 @@ $GLOBALS['result'] = new stdClass();
 $GLOBALS['result']->status = 500;
 $GLOBALS['result']->message = 'Internal server error';
 $GLOBALS['result']->elapsedTime = microtime(true);
+$GLOBALS['result']->source = '';
 $GLOBALS['result']->image = '';
 $GLOBALS['result']->homeImage = '';
 try {
@@ -37,8 +38,23 @@ try {
     $sport = explode(',', $gendersport)[1];
     $url = 'https://www.maxpreps.com/';
     switch ($sport) {
+        case 'bassfishing':
+            $url .= 'bass-fishing';
+            break;
+        case 'beachvolleyball':
+            $url .= 'beach-volleyball';
+            break;
+        case 'canoepaddling':
+            $url .= 'canoe-paddling';
+            break;
         case 'crosscountry':
             $url .= 'cross-country';
+            break;
+        case 'danceteam':
+            $url .= 'dance-team';
+            break;
+        case 'fieldhockey':
+            $url .= 'field-hockey';
             break;
         case 'flagfootball':
             $url .= 'flag-football';
@@ -46,14 +62,14 @@ try {
         case 'icehockey':
             $url .= 'ice-hockey';
             break;
-        case 'fieldhockey':
-            $url .= 'field-hockey';
-            break;
         case 'indoortrackfield':
             $url .= 'indoor-track-field';
             break;
         case 'skisnowboard':
             $url .= 'ski-snowboard';
+            break;
+        case 'slowpitchsoftball':
+            $url .= 'slow-pitch-softball';
             break;
         case 'trackfield':
             $url .= 'track-field';
@@ -61,23 +77,11 @@ try {
         case 'waterpolo':
             $url .= 'water-polo';
             break;
+        case 'weightlifting':
+            $url .= 'weight-lifting';
+            break;
         case 'wheelchairsports':
             $url .= 'wheelchair-sports';
-            break;
-        case 'bassfishing':
-            $url .= 'bass-fishing';
-            break;
-        case 'canoepaddling':
-            $url .= 'canoe-paddling';
-            break;
-        case 'danceteam':
-            $url .= 'dance-team';
-            break;
-        case 'beachvolleyball':
-            $url .= 'beach-volleyball';
-            break;
-        case 'slowpitchsoftball':
-            $url .= 'slow-pitch-softball';
             break;
         default:
             $url .= $sport;
@@ -85,7 +89,7 @@ try {
     $url .= '/';
     switch ($gender) {
         case 'girls':
-            $temp = ['badminton', 'beachvolleyball', 'fieldhockey', 'gymnastics', 'slow-pitch-softball', 'softball', 'volleybal'];
+            $temp = ['badminton', 'beachvolleyball', 'fieldhockey', 'gymnastics', 'slowpitchsoftball', 'softball', 'volleybal'];
             if (!in_array($sport, $temp)) {
                 $url .= 'girls';
             }
@@ -102,6 +106,7 @@ try {
                 $url .= 'boys';
             }
     }
+    $GLOBALS['result']->source = $url;
     $GLOBALS['result']->homeImage = file_get_html('https://maxpreps.com')->find('img', 1)->src;
     $document = file_get_html($url);
     // $s = $document->find('.bKqBtd img');
