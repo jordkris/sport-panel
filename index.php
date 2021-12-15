@@ -34,8 +34,9 @@
 	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
 
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/style.min.css" type="text/css" media="all">
+	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/custom.css" type="text/css" media="all">
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/comments.css" type="text/css" media="all">
-	<link rel="shortcut icon" href="/img/favicon.gif">
+	<link rel="shortcut icon" href="<?= $site_url; ?>/img/favicon.gif">
 </head>
 
 <body class="movie single">
@@ -91,7 +92,7 @@
 							<ul class="dropdown-menu" id="more-menu">
 								<?php
 								$url = '?';
-								$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : '';
+								$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : 'date=' . date('m/d/Y') . '&';
 								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
 								$counter = 0;
 								foreach ($topbar as $t) {
@@ -123,12 +124,10 @@
 					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;" class="img-sport" />
 				</div>
 			</div>
-			<center>
+			<div class="text-center">
 				<img style="max-width:100%;height:auto;padding: 15px;" src="<?php echo $site_url; ?>/img/4k.png">
-			</center>
+			</div>
 			<br />
-			<center>
-			</center>
 		</div>
 		<div id="description" itemscope itemtype="https://schema.org/Movie">
 			<div class="container">
@@ -188,20 +187,27 @@
 								</div>
 							</div>
 							<br>
-							<div class="container" style="background-color: white">
-								<table id="schedule-table" class="table display table-stripped" style="width:100%">
-									<thead>
-										<tr>
-											<th>#</th>
-											<th>Home</th>
-											<th>Away</th>
-											<th class="text-center">Description</th>
-											<th>Date</th>
-											<th>Gender Sport</th>
-											<th>State</th>
-										</tr>
-									</thead>
-								</table>
+							<div class="container" style="background-color: white;padding-top:10px;">
+								<div class="progress-bar-striped">
+									<div style="width: 0%;">
+										<p>0%</p>
+									</div>
+								</div>
+								<div class="table-responsive">
+									<table id="schedule-table" class="table display table-stripped" style="width:100%">
+										<thead>
+											<tr>
+												<th>#</th>
+												<th>Home</th>
+												<th>Away</th>
+												<th class="text-center">Description</th>
+												<th>Date</th>
+												<th>Gender Sport</th>
+												<th>State</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
 							</div>
 							<br>
 							<div class="row">
@@ -517,7 +523,8 @@
 	</script>
 	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main-script.js">
 	</script>
-	<?php //include('histats.php'); ?>
+	<?php //include('histats.php'); 
+	?>
 </body>
 
 </html>

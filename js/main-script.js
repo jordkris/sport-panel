@@ -236,70 +236,90 @@ async function loadSchedule(date, gendersport, state) {
             "className": "text-center"
         }]
     });
-    t.clear().draw();
     $('th.text-justify').removeClass('text-justify').addClass('text-center');
-    $.ajax({
-        url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}`,
-        type: 'GET',
-        success: async(res) => {
-            if (res.status == 200) {
-                try {
-                    let tasks = [],
-                        val;
-                    let thread = 5;
-                    for (let i = 0; i < res.data.length; i++) {
-                        val = res.data[i];
-                        console.log(val, i);
-                        tasks.push(new Promise(async(resolve, reject) => {
-                            $.ajax({
-                                url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}&index=${val.index}&url=${val.url}`,
-                                type: 'GET',
-                                success: (r) => {
-                                    if (r.status == 200) {
-                                        t.row.add([
-                                            '',
-                                            r.data.home,
-                                            r.data.away,
-                                            r.data.description,
-                                            r.data.date,
-                                            r.data.gendersport,
-                                            r.data.state
-                                        ]).draw(false);
-                                        resolve();
-                                    }
-                                },
-                                error: (e) => {
-                                    reject(e);
-                                }
-                            });
-                        }));
-                        if (i % thread == 0) {
-                            await Promise.all(tasks).then((val) => {
-                                console.log((i + 1) + ' tasks success!');
-                            });
-                            tasks = [];
-                        }
-                        if (i == res.data.length - 1) {
-                            await Promise.all(tasks).then((val) => {
-                                console.log((i + 1) + ' tasks success!');
-                            });
-                            tasks = [];
-                        }
-                    }
-                    t.on('order.dt search.dt', function() {
-                        t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
-                            cell.innerHTML = i + 1;
-                        });
-                    }).draw();
-                } catch (e) {
-                    console.error(e);
+    t.clear().draw();
+    t.on('order.dt search.dt', function() {
+        t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
+    let result = await new Promise((resolve, reject) => {
+        $.ajax({
+            url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}`,
+            type: 'GET',
+            success: (res) => {
+                if (res.status == 200) {
+                    resolve(res);
+                } else {
+                    reject(res.message);
                 }
+            },
+            error: (e) => {
+                console.error(e);
+                reject(e);
             }
-        },
-        error: (e) => {
-            console.error(e);
-        }
+        });
     });
+    console.log(await result);
+    try {
+        let tasks = [],
+            val;
+        let thread = 5;
+        let counter = 0;
+        for (let i = 0; i < await result.data.length; i++) {
+            val = await result.data[i];
+            console.log(await val, i);
+            tasks.push(new Promise((resolve, reject) => {
+                $.ajax({
+                    url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}&index=${val.index}&url=${val.url}`,
+                    type: 'GET',
+                    success: (r) => {
+                        if (r.status == 200) {
+                            t.row.add([
+                                '',
+                                r.data.home,
+                                r.data.away,
+                                r.data.description,
+                                r.data.date,
+                                r.data.gendersport,
+                                r.data.state
+                            ]).draw(false);
+                            resolve('');
+                        } else {
+                            reject(r.message);
+                        }
+                    },
+                    error: (e) => {
+                        console.log(e);
+                        reject(e);
+                    }
+                });
+            }));
+            if (i % thread == 0) {
+                await Promise.all(tasks).then((val) => {
+                    counter += val.length;
+                    handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
+                    console.log(counter + ' tasks success!');
+                });
+                tasks = [];
+            }
+            if (i == result.data.length - 1) {
+                await Promise.all(tasks).then((val) => {
+                    counter += val.length;
+                    handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
+                    console.log(counter + ' tasks success!');
+                });
+                tasks = [];
+            }
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function handleProgressBar(value) {
+    $(".progress-bar-striped > div").html(value + "%");
+    $(".progress-bar-striped > div").css('width', value + "%");
 }
 
 async function startUp() {
