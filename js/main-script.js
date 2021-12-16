@@ -221,31 +221,32 @@ async function changeParam(link) {
 }
 
 // datatables
-async function loadSchedule(date, gendersport, state) {
-    let t = $('#schedule-table').DataTable({
-        "columns": [{
-            "className": "text-center"
-        }, {
-            "className": "text-center"
-        }, {
-            "className": "text-center"
-        }, {
-            "className": "text-justify"
-        }, {
-            "className": "text-center"
-        }, {
-            "className": "text-center"
-        }, {
-            "className": "text-center"
-        }]
+let t = $('#schedule-table').DataTable({
+    "columns": [{
+        "className": "text-center"
+    }, {
+        "className": "text-center"
+    }, {
+        "className": "text-center"
+    }, {
+        "className": "text-justify"
+    }, {
+        "className": "text-center"
+    }, {
+        "className": "text-center"
+    }, {
+        "className": "text-center"
+    }]
+});
+$('th.text-justify').removeClass('text-justify').addClass('text-center');
+t.clear().draw();
+t.on('order.dt search.dt', function() {
+    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
+        cell.innerHTML = i + 1;
     });
-    $('th.text-justify').removeClass('text-justify').addClass('text-center');
-    t.clear().draw();
-    t.on('order.dt search.dt', function() {
-        t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
+}).draw();
+
+async function loadSchedule(date, gendersport, state) {
     let result = await new Promise((resolve, reject) => {
         $.ajax({
             url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}`,
