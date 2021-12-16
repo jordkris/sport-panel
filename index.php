@@ -63,8 +63,8 @@
 						$topbar = json_decode(file_get_contents('topbar.json'), true);
 						$sportData = json_decode(file_get_contents('sportData.json'), true);
 						$url = '?';
-						$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : '';
-						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
+						$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : 'date=' . date('m/d/Y') . '&';
+						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : 'state=al&';
 						$counter = 0;
 						foreach ($topbar as $t) {
 							if ($counter < 5) {
@@ -93,7 +93,7 @@
 								<?php
 								$url = '?';
 								$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : 'date=' . date('m/d/Y') . '&';
-								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
+								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : 'state=al&';
 								$counter = 0;
 								foreach ($topbar as $t) {
 									$link = $url . 'gendersport=' . $t;
@@ -187,26 +187,28 @@
 								</div>
 							</div>
 							<br>
-							<div class="container" style="background-color: white;padding-top:10px;">
-								<div class="progress-bar-striped">
-									<div style="width: 0%;">
-										<p>0%</p>
+							<div class="row" style="background-color: white;padding-top:10px;">
+								<div class="container">
+									<div id="progress-bar" class="progress-bar-striped" style="display: none;">
+										<div style="width: 0%;">
+											<p>0%</p>
+										</div>
 									</div>
-								</div>
-								<div class="table-responsive">
-									<table id="schedule-table" class="table display table-stripped" style="width:100%">
-										<thead>
-											<tr>
-												<th>#</th>
-												<th>Home</th>
-												<th>Away</th>
-												<th class="text-center">Description</th>
-												<th>Date</th>
-												<th>Gender Sport</th>
-												<th>State</th>
-											</tr>
-										</thead>
-									</table>
+									<div class="table-responsive">
+										<table id="schedule-table" class="table display table-stripped" style="width:100%">
+											<thead>
+												<tr>
+													<th>#</th>
+													<th>Home</th>
+													<th>Away</th>
+													<th class="text-center">Description</th>
+													<th>Date</th>
+													<th>Gender Sport</th>
+													<th>State</th>
+												</tr>
+											</thead>
+										</table>
+									</div>
 								</div>
 							</div>
 							<br>
@@ -521,7 +523,7 @@
 	</script>
 	<script type="text/javascript" src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/script.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
 	</script>
 	<?php //include('histats.php'); 
 	?>

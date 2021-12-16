@@ -204,18 +204,21 @@ async function loadMetadata(gendersport) {
 
 
 async function changeParam(link) {
-    window.history.pushState('page2', 'Title', link);
-    let currentUrl = new URL(location.href).searchParams;
-    let date = currentUrl.get('date');
-    let gendersport = currentUrl.get("gendersport");
-    let state = currentUrl.get('state');
-    // let gendersport = link.split('gendersport=')[1];
-    handleLocalTopbar(true, gendersport);
-    loadMetadata(gendersport);
-    await loadSchedule(date, gendersport, state);
+    try {
+        throw new Error('Stopping excecution');
+    } catch (e) {
+        window.history.pushState('page2', 'Title', link);
+        let currentUrl = new URL(location.href).searchParams;
+        let date = currentUrl.get('date');
+        let gendersport = currentUrl.get("gendersport");
+        let state = currentUrl.get('state');
+        // let gendersport = link.split('gendersport=')[1];
+        handleLocalTopbar(true, gendersport);
+        loadMetadata(gendersport);
+        await loadSchedule(date, gendersport, state);
+    }
+
 }
-
-
 
 // datatables
 async function loadSchedule(date, gendersport, state) {
@@ -266,6 +269,7 @@ async function loadSchedule(date, gendersport, state) {
             val;
         let thread = 5;
         let counter = 0;
+        $('#progress-bar').css('display', '');
         for (let i = 0; i < await result.data.length; i++) {
             val = await result.data[i];
             console.log(await val, i);
@@ -284,7 +288,9 @@ async function loadSchedule(date, gendersport, state) {
                                 r.data.gendersport,
                                 r.data.state
                             ]).draw(false);
-                            resolve('');
+                            counter++;
+                            handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
+                            resolve();
                         } else {
                             reject(r.message);
                         }
@@ -297,17 +303,18 @@ async function loadSchedule(date, gendersport, state) {
             }));
             if (i % thread == 0) {
                 await Promise.all(tasks).then((val) => {
-                    counter += val.length;
-                    handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
                     console.log(counter + ' tasks success!');
+                }).catch((e) => {
+                    throw new Error(e);
                 });
                 tasks = [];
             }
             if (i == result.data.length - 1) {
                 await Promise.all(tasks).then((val) => {
-                    counter += val.length;
-                    handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
                     console.log(counter + ' tasks success!');
+                    $('#progress-bar').css('display', 'none');
+                }).catch((e) => {
+                    throw new Error(e);
                 });
                 tasks = [];
             }
