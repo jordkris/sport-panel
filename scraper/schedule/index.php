@@ -156,6 +156,7 @@ try {
                 if (isset($_GET['index']) && isset($_GET['url'])) {
                     $GLOBALS['result']->total = 1;
                     $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $gendersport, $state, $_GET['url']);
+                    $GLOBALS['result']->message = 'Successfully load data';
                 } else {
                     $res = [];
                     for ($i = 0; $i < count($teams); $i++) {
@@ -164,11 +165,11 @@ try {
                     $GLOBALS['result']->data = array_values(array_filter($res, function ($val) {
                         return $val != new stdClass();
                     }));
+                    $GLOBALS['result']->message = 'Successfully load data ('.$date.' | '.$gendersport.' | '.$state.')';
                     // $GLOBALS['result']->data = $res;
                 }
                 $GLOBALS['result']->status = 200;
                 $GLOBALS['result']->source = $url;
-                $GLOBALS['result']->message = 'Successfully load data';
             } else {
                 $GLOBALS['result']->message = 'No teams found';
             }

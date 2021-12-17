@@ -32,6 +32,7 @@
 	<link rel="stylesheet" id="simple-css" href="//cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="google-font" href="//fonts.googleapis.com/css?family=Oswald|Open+Sans" type="text/css" media="all">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/style.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/custom.css" type="text/css" media="all">
@@ -62,9 +63,12 @@
 						<?php
 						$topbar = json_decode(file_get_contents('topbar.json'), true);
 						$sportData = json_decode(file_get_contents('sportData.json'), true);
+						$stateData = json_decode(file_get_contents('stateData.json'), true);
+						$stateKey = array_keys($stateData);
 						$url = '?';
-						$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : 'date=' . date('m/d/Y') . '&';
-						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : 'state=al&';
+						$url .= isset($_GET['startdate']) ? 'startdate=' . $_GET['startdate'] . '&' : '';
+						$url .= isset($_GET['enddate']) ? 'enddate=' . $_GET['enddate'] . '&' : '';
+						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
 						$counter = 0;
 						foreach ($topbar as $t) {
 							if ($counter < 5) {
@@ -92,8 +96,9 @@
 							<ul class="dropdown-menu" id="more-menu">
 								<?php
 								$url = '?';
-								$url .= isset($_GET['date']) ? 'date=' . $_GET['date'] . '&' : 'date=' . date('m/d/Y') . '&';
-								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : 'state=al&';
+								$url .= isset($_GET['startdate']) ? 'startdate=' . $_GET['startdate'] . '&' : '';
+								$url .= isset($_GET['enddate']) ? 'enddate=' . $_GET['enddate'] . '&' : '';
+								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
 								$counter = 0;
 								foreach ($topbar as $t) {
 									$link = $url . 'gendersport=' . $t;
@@ -189,9 +194,42 @@
 							<br>
 							<div class="row" style="background-color: white;padding-top:10px;">
 								<div class="container">
-									<div id="progress-bar" class="progress-bar-striped" style="display: none;">
-										<div style="width: 0%;">
-											<p>0%</p>
+									<div class="row" style="margin-bottom: 20px;">
+										<div class="col-lg-4">
+											<ul id="loading-log"></ul>
+											<button id="clear-log" class="btn btn-danger"><i class="icon fa fa-trash"></i> Clear Log</button>
+										</div>
+										<div class="col-lg-8">
+											<div class="row" style="color:black;margin-bottom: 20px;">
+												<div class="col-lg-3">
+													<label for="start-date">Start Date</label>
+													<input type="date" id="start-date" class="form-control">
+												</div>
+												<div class="col-lg-3">
+													<label for="end-date">End Date</label>
+													<input type="date" id="end-date" class="form-control">
+												</div>
+												<div class="col-lg-6"></div>
+												<div class="col-lg-12" style="margin-bottom:20px;">
+													<label for="state">State</label><br />
+													<select id="state" multiple="multiple">
+														<?php foreach ($stateData as $key => $val) { ?>
+															<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
+														<?php } ?>
+													</select>
+												</div>
+												<div class="col-lg-12">
+													<div id="progress-bar" class="progress-bar-striped">
+														<div style="width: 0%;">
+															<p>0%</p>
+														</div>
+													</div>
+												</div>
+												<div class="col-lg-12">
+													<button id="start-loading" class="btn btn-success"><i class="icon fa fa-play"></i> Start</button>
+													<button id="stop-loading" class="btn btn-danger" style="display:none;"><i class="icon fa fa-stop"></i> Stop</button>
+												</div>
+											</div>
 										</div>
 									</div>
 									<div class="table-responsive">
@@ -523,7 +561,11 @@
 	</script>
 	<script type="text/javascript" src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main-script.js">
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
+	</script>
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
 	</script>
 	<?php //include('histats.php'); 
 	?>
