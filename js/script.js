@@ -153,7 +153,6 @@ async function handleMainImage(gendersport, dom) {
                 } else {
                     $(dom).attr('src', res.defaultImage);
                 }
-                handleLog('success', 'Success load image from ' + res.source);
             } else {
                 $(dom).attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=' + res.message);
                 handleLog('warning', res.message);
@@ -194,7 +193,6 @@ async function loadMetadata(gendersport) {
                 } else {
                     $('.img-sport').attr('src', res.defaultImage);
                 }
-                handleLog('success', 'Success load image from ' + res.source);
             } else {
                 $('.img-sport').attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=' + res.message);
                 handleLog('warning', res.message);
@@ -235,28 +233,40 @@ async function changeParam(link) {
     window.history.pushState('page2', 'Title', link);
     let currentUrl = new URL(location.href).searchParams;
     let gendersport = currentUrl.get("gendersport");
-    handleLocalTopbar(true, gendersport);
+    handleLog('info', 'Loading metadata...');
     loadMetadata(gendersport);
+    handleLog('info', 'Loading topbar data...');
+    handleLocalTopbar(true, gendersport);
     // await loadSchedule(date, gendersport, state);
 }
 
 // excecution data
-let execution = false;
 let ajaxTemp;
 
 async function beginExecution() {
     try {
-        let currentUrl = new URL(location.href).searchParams;
+        let longUrl = new URL(location.href);
+        let currentUrl = longUrl.searchParams;
+
         let startDate = $('#start-date').val();
         let endDate = $('#end-date').val();
         if (startDate == '') throw new Error('Start date is empty');
         if (endDate == '') throw new Error('End date is empty');
         if (startDate > endDate) throw new Error('Start date must be less than or equal to end date');
         let allDate = getDaysArray(new Date(startDate), new Date(endDate));
+
         let gendersport = currentUrl.get("gendersport");
+
         let stateArr = $('#state').val();
         if (stateArr === null || stateArr.length === 0) throw new Error('State is empty');
-        await loadSchedule(allDate, gendersport, stateArr);
+
+        let threads = $('#threads').val();
+        if (threads == '') throw new Error('Threads is empty');
+        currentUrl.set('startdate', convertDate(startDate, true));
+        currentUrl.set('enddate', convertDate(endDate, true));
+        currentUrl.set('state', stateArr.join(','));
+        window.history.pushState('page2', 'Title', longUrl);
+        await loadSchedule(allDate, gendersport, stateArr, threads);
     } catch (e) {
         showControlButton('start');
         handleLog('error', e || e.getMessage());
@@ -264,7 +274,7 @@ async function beginExecution() {
 }
 
 function abortExecution() {
-    execution = false;
+    localStorage.setItem('execution', 'false');
     if (ajaxTemp !== undefined) {
         ajaxTemp.abort();
     }
@@ -273,119 +283,213 @@ function abortExecution() {
 
 $('#start-loading').click(() => {
     console.log('click start');
+    handleProgressBar('#progress-bar-url', 0, 1);
+    handleProgressBar('#progress-bar-schedule', 0, 1);
     showControlButton('stop');
     beginExecution();
 });
 $('#stop-loading').click(() => {
     console.log('click stop');
+    handleProgressBar('#progress-bar-url', 0, 1);
+    handleProgressBar('#progress-bar-schedule', 0, 1);
     showControlButton('start');
     abortExecution();
 });
 
-async function loadSchedule(date, gendersport, state) {
-    handleLog('info', 'Loading schedule...');
-    execution = true;
+async function getAllUrl(date, gendersport, state, threads) {
+    handleLog('info', 'Get all URL(s)...');
     let allResult = [],
-        result, tasks, val, thread = 5,
-        counter = 0,
-        total = 0;
-    while (execution) {
-        t.clear().draw();
+        loop = 1,
+        counter = 1,
+        tasks = [],
+        total = date.length * state.length,
+        trueSchedule = 0;
+    return new Promise(async(resolve, reject) => {
         for (let x = 0; x < date.length; x++) {
             for (let y = 0; y < state.length; y++) {
-                try {
-                    result = await new Promise((resolve, reject) => {
-                        $.ajax({
-                            url: `${location.href.split('?')[0]}scraper/schedule/?date=${date[x]}&gendersport=${gendersport}&state=${state[y]}`,
-                            type: 'GET',
-                            success: (res) => {
-                                if (res.status == 200) {
+                if (localStorage.getItem('execution') == 'true') {
+                    try {
+                        tasks.push(new Promise((resolve, reject) => {
+                            $.ajax({
+                                url: `${location.href.split('?')[0]}scraper/schedule/?date=${date[x]}&gendersport=${gendersport}&state=${state[y]}`,
+                                type: 'GET',
+                                success: (res) => {
+                                    if (res.status == 200) {
+                                        trueSchedule += res.total;
+                                        $('#true-schedule').html(trueSchedule);
+                                    }
                                     handleLog('info', res.message);
-                                    resolve(res);
-                                } else {
-                                    reject(res.message);
-                                }
-                            },
-                            error: (e) => {
-                                handleLog('error', e || e.getMessage());
-                                console.error(e);
-                                reject(e);
-                            }
-                        });
-                    });
-                    allResult.push(await result);
-                    total += await result.total;
-                    console.log(await result);
-                } catch (err) {
-                    handleLog('error', err || err.getMessage());
-                    console.error(err);
-                }
-            }
-        }
-        try {
-            throw new Error('custom error');
-            tasks = [];
-            for (let i = 0; i < total; i++) {
-                result = await allResult[i];
-                if (execution) {
-                    val = await result.data[i];
-                    console.log(await val);
-                    tasks.push(new Promise((resolve, reject) => {
-                        ajaxTemp = $.ajax({
-                            url: `${location.href.split('?')[0]}scraper/schedule/?date=${date}&gendersport=${gendersport}&state=${state}&index=${val.index}&url=${val.url}`,
-                            type: 'GET',
-                            success: (r) => {
-                                if (r.status == 200) {
-                                    t.row.add([
-                                        '',
-                                        r.data.home,
-                                        r.data.away,
-                                        r.data.description,
-                                        r.data.date,
-                                        r.data.gendersport,
-                                        r.data.state
-                                    ]).draw(false);
+                                    handleProgressBar('#progress-bar-url', counter, total);
                                     counter++;
-                                    handleProgressBar(Math.round((counter / result.data.length) * 10000) / 100);
-                                    resolve();
-                                } else {
-                                    reject(r.message);
+                                    resolve(res);
+                                    // if (res.status == 200) {
+                                    // total += res.total;
+                                    // } else {
+                                    // }
+                                },
+                                error: (e) => {
+                                    handleLog('error', e || e.getMessage());
+                                    console.error(e);
+                                    reject(e);
                                 }
-                            },
-                            error: (e) => {
-                                console.log(e);
-                                reject(e);
-                            }
-                        });
-                    }));
-                    if (i % thread == 0) {
-                        await Promise.all(tasks).then((val) => {
-                            tasks = [];
-                            console.log(counter + ' tasks success!');
-                        }).catch((e) => {
-                            throw new Error(e);
-                        });
-                    }
-                    if (i == result.data.length - 1) {
-                        await Promise.all(tasks).then((val) => {
-                            tasks = [];
-                            console.log(counter + ' tasks success!');
-                            $(".progress-bar-striped > div").html(value + "% ✅");
-                            showControlButton('start');
-                        }).catch((e) => {
-                            throw new Error(e);
-                        });
-
+                            });
+                        }));
+                        console.log(loop);
+                        if (loop % threads == 0) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    allResult = allResult.concat(val);
+                                    console.log(loop + ' tasks success!');
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    reject('Execution has been aborted');
+                                }
+                            }).catch((e) => {
+                                console.error(e);
+                            });
+                        }
+                        if (loop == date.length * state.length) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    allResult = allResult.concat(val);
+                                    console.log(loop + ' tasks success!');
+                                    resolve(allResult);
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    reject('Execution has been aborted');
+                                }
+                            }).catch((e) => {
+                                console.error(e);
+                            });
+                        }
+                    } catch (err) {
+                        handleLog('error', err);
+                        console.error(err);
+                    } finally {
+                        loop++;
                     }
                 } else {
-                    throw new Error('Execution aborted');
+                    handleProgressBar('#progress-bar-url', 0, 1);
+                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                    reject('Execution has been aborted');
                 }
             }
-        } catch (err) {
-            showControlButton('start');
-            handleLog('error', err || err.getMessage());
-            console.error(err);
         }
+    });
+}
+
+async function getAllSchedule(allUrl, threads) {
+    handleLog('info', 'Get all Schedule(s)...');
+    let counter = 1,
+        tasks = [],
+        total = allUrl.reduce((a, b) => {
+            return a + b.total;
+        }, 0),
+        trueData = allUrl.filter(v => v.status == 200);
+    return new Promise(async(resolve, reject) => {
+        tasks = [];
+        for (let i = 0; i < trueData.length; i++) {
+            for (let j = 0; j < trueData[i].data.length; j++) {
+                if (localStorage.getItem('execution') == 'true') {
+                    try {
+                        tasks.push(new Promise((resolve, reject) => {
+                            ajaxTemp = $.ajax({
+                                url: `${location.href.split('?')[0]}scraper/schedule/?date=${trueData[i].date}&gendersport=${trueData[i].gendersport}&state=${trueData[i].state}&index=${trueData[i].data[j].index}&url=${trueData[i].data[j].url}`,
+                                type: 'GET',
+                                success: (r) => {
+                                    if (r.status == 200) {
+                                        t.row.add([
+                                            '',
+                                            r.data.home,
+                                            r.data.away,
+                                            r.data.description,
+                                            r.data.date,
+                                            r.data.gendersport,
+                                            r.data.state
+                                        ]).draw(false);
+                                        handleLog('info', r.message);
+                                        handleProgressBar('#progress-bar-schedule', counter, total);
+                                        counter++;
+                                        resolve();
+                                    } else {
+                                        reject(r.message);
+                                    }
+                                },
+                                error: (e) => {
+                                    console.log(e);
+                                    reject(e);
+                                }
+                            });
+                        }));
+                        if (j % threads == 0) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    console.log(counter + ' tasks success!');
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    throw new Error('Execution aborted');
+                                }
+                            }).catch((e) => {
+                                reject(e);
+                            });
+                        }
+                        if (j == trueData[i].data.length - 1) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    console.log(counter + ' tasks success!');
+                                    if (counter == total) {
+                                        $(".progress-bar-striped > div").html("100% ✅");
+                                        showControlButton('start');
+                                        resolve();
+                                    }
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    throw new Error('Execution aborted');
+                                }
+                            }).catch((e) => {
+                                throw new Error(e);
+                            });
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                } else {
+                    handleProgressBar('#progress-bar-url', 0, 1);
+                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                    reject('Execution aborted');
+                }
+            }
+        }
+    });
+}
+
+async function loadSchedule(date, gendersport, state, threads) {
+    localStorage.setItem('execution', 'true');
+
+    while (localStorage.getItem('execution')) {
+        t.clear().draw();
+        // let allUrl = new Promise((resolve, reject) => {
+
+        // resolve(allResult);
+        // });
+        let allUrl = await getAllUrl(date, gendersport, state, threads);
+        let total = allUrl.reduce((a, b) => {
+            return a + b.total;
+        }, 0);
+        if (total > 0) {
+            await getAllSchedule(await allUrl, threads);
+        } else {
+            showControlButton('start');
+        }
+
         await delay(86400000);
     }
 }
@@ -395,16 +499,19 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function handleProgressBar(value) {
-    $(".progress-bar-striped > div").html(value + "%");
-    $(".progress-bar-striped > div").css('width', value + "%");
+async function handleProgressBar(id, value, total) {
+    let percent = Math.round((value / total) * 10000) / 100;
+    $(id + " > div").html(percent + "%");
+    $(id + " > div").css('width', percent + "%");
 }
 
 function showControlButton(status) {
     if (status == 'start') {
+        localStorage.setItem('execution', 'false');
         $('#start-loading').css('display', '');
         $('#stop-loading').css('display', 'none');
     } else {
+        localStorage.setItem('execution', 'true');
         $('#start-loading').css('display', 'none');
         $('#stop-loading').css('display', '');
     }
@@ -419,7 +526,7 @@ function handleLog(status, message) {
     } else if (status == 'info') {
         $('#loading-log').prepend(`<li style="color:black;"><small>${datetime}</small><div>${message}</div></li>`);
     } else if (status == 'warning') {
-        $('#loading-log').prepend(`<li style="color:yellow;"><small>${datetime}</small><div>${message}</div></li>`);
+        $('#loading-log').prepend(`<li style="color: darkgoldenrod;"><small>${datetime}</small><div>${message}</div></li>`);
     } else if (status == 'error') {
         $('#loading-log').prepend(`<li style="color:red;"><small>${datetime}</small><div>${message}</div></li>`);
     }
@@ -436,9 +543,21 @@ function getDaysArray(start, end) {
     });
 }
 
-function convertDate(date) {
-    let tempDate = date.split('/');
-    return [tempDate[2], tempDate[1], tempDate[0]].join('-');
+function convertDate(date, reverse = false) {
+    let tempDate, year, month, day;
+    if (reverse) {
+        tempDate = date.split('-');
+        year = tempDate[0];
+        month = tempDate[1];
+        day = tempDate[2];
+        return [month, day, year].join('/');
+    } else {
+        tempDate = date.split('/');
+        year = tempDate[2];
+        month = parseInt(tempDate[0]);
+        day = parseInt(tempDate[1]);
+        return [year, month < 10 ? '0' + month : month, day < 10 ? '0' + day : day].join('-');
+    }
 }
 
 $('#clear-log').click(() => {
@@ -465,7 +584,7 @@ function customStartUp() {
         $('#end-date').val(convertDate(currentUrl.get('enddate')));
 
     }
-    console.clear();
+    // console.clear();
 }
 
 async function startUp() {

@@ -198,6 +198,7 @@
 										<div class="col-lg-4">
 											<ul id="loading-log"></ul>
 											<button id="clear-log" class="btn btn-danger"><i class="icon fa fa-trash"></i> Clear Log</button>
+											<span style="color:black;float:right;">Total Available Schedule : <span id="true-schedule">0</span></span>
 										</div>
 										<div class="col-lg-8">
 											<div class="row" style="color:black;margin-bottom: 20px;">
@@ -209,17 +210,30 @@
 													<label for="end-date">End Date</label>
 													<input type="date" id="end-date" class="form-control">
 												</div>
-												<div class="col-lg-6"></div>
-												<div class="col-lg-12" style="margin-bottom:20px;">
+												<div class="col-lg-3">
+													<label for="threads">Threads</label>
+													<input type="number" id="threads" class="form-control" min="1" max="10" value="2">
+												</div>
+												<div class="col-lg-3"></div>
+												<div class="col-lg-12" style="margin-bottom:20px;margin-top:20px;">
 													<label for="state">State</label><br />
-													<select id="state" multiple="multiple">
+													<select id="state" multiple="multiple" class="form-control">
 														<?php foreach ($stateData as $key => $val) { ?>
 															<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
 														<?php } ?>
 													</select>
 												</div>
 												<div class="col-lg-12">
-													<div id="progress-bar" class="progress-bar-striped">
+													<label for="progress-bar-url">URLs</label><br />
+													<div id="progress-bar-url" class="progress-bar-striped">
+														<div style="width: 0%;">
+															<p>0%</p>
+														</div>
+													</div>
+												</div>
+												<div class="col-lg-12">
+													<label for="progress-bar-schedule">Schedules</label><br />
+													<div id="progress-bar-schedule" class="progress-bar-striped">
 														<div style="width: 0%;">
 															<p>0%</p>
 														</div>
@@ -565,7 +579,7 @@
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/script.js">
 	</script>
 	<?php //include('histats.php'); 
 	?>

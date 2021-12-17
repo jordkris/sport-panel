@@ -3,8 +3,8 @@ date_default_timezone_set("Asia/Jakarta");
 set_time_limit(0);
 require '../../vendor/simple_html_dom/simple_html_dom.php';
 
-$GLOBALS['sportData'] = json_decode(file_get_contents('../../sportData.json'),true);
-$GLOBALS['stateData'] = json_decode(file_get_contents('../../stateData.json'),true);
+$GLOBALS['sportData'] = json_decode(file_get_contents('../../sportData.json'), true);
+$GLOBALS['stateData'] = json_decode(file_get_contents('../../stateData.json'), true);
 
 function getParam($param)
 {
@@ -120,6 +120,9 @@ $GLOBALS['result']->message = 'Internal server error';
 $GLOBALS['result']->elapsedTime = microtime(true);
 $GLOBALS['result']->source = '';
 $GLOBALS['result']->total = 0;
+$GLOBALS['result']->date = '';
+$GLOBALS['result']->gendersport = '';
+$GLOBALS['result']->state = '';
 $GLOBALS['result']->data = [];
 try {
     $date = getParam('date');
@@ -128,13 +131,18 @@ try {
 
     if (isTrueDate($date)) {
         $date = trimZeroPrefixDate($date);
+        $GLOBALS['result']->date = $date;
     } else {
         throw new Exception('Invalid date. date parameter must be MM/DD/YYYY!');
     }
-    if (!isTrueGenderSport($gendersport)) {
+    if (isTrueGenderSport($gendersport)) {
+        $GLOBALS['result']->gendersport = $gendersport;
+    } else {
         throw new Exception('Invalid gender sport. gendersport parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['sportData'])) . ']');
     }
-    if (!isTrueState($state)) {
+    if (isTrueState($state)) {
+        $GLOBALS['result']->state = $state;
+    } else {
         throw new Exception('Invalid state. state parameter must included in this array : [' . implode(' ', array_keys($GLOBALS['stateData'])) . ']');
     }
     $url = 'https://www.maxpreps.com/list/schedules_scores.aspx?date=' . $date . '&gendersport=' . $gendersport . '&state=' . $state;
@@ -144,6 +152,7 @@ try {
         $filterData = explode('&', explode('?', $element->href)[1]);
         $availableDate[] = explode('=', $filterData[0])[1];
     }
+    $currentInfo = '| ' . $GLOBALS['sportData'][$gendersport] . ' | ' . $GLOBALS['stateData'][$state] . ' | ' . $date;
     if (in_array($date, $availableDate)) {
         if (!(count($document->find('.no-data')) > 0)) {
             $teams = $document->find('[data-teams]');
@@ -152,11 +161,10 @@ try {
                 if (isContains($cup, 'Schedule')) {
                     $cup = str_replace('Schedule', '', $cup);
                 }
-
                 if (isset($_GET['index']) && isset($_GET['url'])) {
                     $GLOBALS['result']->total = 1;
                     $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $gendersport, $state, $_GET['url']);
-                    $GLOBALS['result']->message = 'Successfully load data';
+                    $GLOBALS['result']->message = 'Successfully load data ' . $currentInfo.' | '.$GLOBALS['result']->data->home.' vs '.$GLOBALS['result']->data->away;
                 } else {
                     $res = [];
                     for ($i = 0; $i < count($teams); $i++) {
@@ -165,8 +173,7 @@ try {
                     $GLOBALS['result']->data = array_values(array_filter($res, function ($val) {
                         return $val != new stdClass();
                     }));
-                    $GLOBALS['result']->message = 'Successfully load data ('.$date.' | '.$gendersport.' | '.$state.')';
-                    // $GLOBALS['result']->data = $res;
+                    $GLOBALS['result']->message = count($GLOBALS['result']->data) . ' schedule(s) available ' . $currentInfo;
                 }
                 $GLOBALS['result']->status = 200;
                 $GLOBALS['result']->source = $url;
@@ -177,7 +184,7 @@ try {
             $GLOBALS['result']->message = 'No cup available';
         }
     } else {
-        $GLOBALS['result']->message = 'No schedules available';
+        $GLOBALS['result']->message = 'No schedules available ' . $currentInfo;
     }
 } catch (Exception $e) {
     $GLOBALS['result']->message = $e->getMessage();
