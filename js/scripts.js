@@ -237,6 +237,7 @@ async function changeParam(link) {
     loadMetadata(gendersport);
     handleLog('info', 'Loading topbar data...');
     handleLocalTopbar(true, gendersport);
+    showControlButton('start');
     // await loadSchedule(date, gendersport, state);
 }
 
