@@ -573,7 +573,7 @@
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main-script.js">
 	</script>
 	<?php //include('histats.php'); 
 	?>

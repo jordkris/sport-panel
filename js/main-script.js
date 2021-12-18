@@ -369,7 +369,9 @@ async function getAllUrl(date, gendersport, state, threads) {
                                     allResult = allResult.concat(val);
                                     console.log(loop + ' tasks success!');
                                     $("#progress-bar-url > div").html("100% ✅");
-                                    resolve(allResult);
+                                    setTimeout(() => {
+                                        resolve(allResult);
+                                    }, 3000);
                                 } else {
                                     handleProgressBar('#progress-bar-url', 0, 1);
                                     handleProgressBar('#progress-bar-schedule', 0, 1);
