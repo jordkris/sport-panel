@@ -1,6 +1,0 @@
-602|Sport;
-224|Sport2;
-604|Boxing Umum;
-224|Boxing Spesial;
-604|UFC;
-21|Movie/TV;

@@ -54,12 +54,6 @@
 				</div>
 				<nav class="collapse navbar-collapse" id="main-navbar">
 					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="<?= $site_url; ?>">
-								<span class="icon fa fa-home">
-								</span> Home
-							</a>
-						</li>
 						<?php
 						$topbar = json_decode(file_get_contents('topbar.json'), true);
 						$sportData = json_decode(file_get_contents('sportData.json'), true);
@@ -224,7 +218,7 @@
 													</select>
 												</div>
 												<div class="col-lg-12">
-													<label for="progress-bar-url">URLs</label><br />
+													<label for="progress-bar-url">URLs <span id="status-bar-url"></span></label><br />
 													<div id="progress-bar-url" class="progress-bar-striped">
 														<div style="width: 0%;">
 															<p>0%</p>
@@ -232,7 +226,7 @@
 													</div>
 												</div>
 												<div class="col-lg-12">
-													<label for="progress-bar-schedule">Schedules</label><br />
+													<label for="progress-bar-schedule">Schedules <span id="status-bar-schedule"></span></label><br />
 													<div id="progress-bar-schedule" class="progress-bar-striped">
 														<div style="width: 0%;">
 															<p>0%</p>
@@ -579,7 +573,7 @@
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/script.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
 	</script>
 	<?php //include('histats.php'); 
 	?>
