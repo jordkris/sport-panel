@@ -59,7 +59,6 @@
 }
 
 body {
-    padding-top: 71px;
     font-family: 'Open Sans', sans-serif;
     background-image: url('../img/bg.jpg');
     background-attachment: fixed;
@@ -73,6 +72,10 @@ h2,
 h3,
 h4 {
     font-family: 'Oswald', sans-serif;
+}
+
+label {
+    color: #000;
 }
 
 textarea {
@@ -551,7 +554,6 @@ a.nodecor:focus {
 .form-control[disabled],
 .form-control[readonly],
 fieldset[disabled] .form-control {
-    background-color: #191919;
     color: #555;
 }
 
@@ -2528,7 +2530,7 @@ footer#site-footer {
 
 @media (max-width: 767px) {
     body {
-        padding-top: 50px;
+        /* padding-top: 50px; */
     }
     .nomobile {
         display: none!important;

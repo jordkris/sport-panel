@@ -83,15 +83,17 @@ function getScheduleUrl($i, $document)
     $link =  $linkData != [] ? $linkData : 'link not found';
     if (!($link == 'link not found')) {
         $link = $linkData[0]->href;
-    }
-    if (count($contest) == 2) {
-        $home = html_entity_decode(trim($contest[0]->text()));
-        $away = html_entity_decode(trim($contest[1]->text()));
-        if (!(strtolower($home) == 'tba' || strtolower($away) == 'tba')) {
-            $singleRes->index = $i;
-            $singleRes->url = $link;
-            return $singleRes;
+        if (count($contest) == 2) {
+            $home = html_entity_decode(trim($contest[0]->text()));
+            $away = html_entity_decode(trim($contest[1]->text()));
+            if (!(strtolower($home) == 'tba' || strtolower($away) == 'tba')) {
+                $singleRes->index = $i;
+                $singleRes->url = $link;
+                return $singleRes;
+            }
         }
+    } else {
+        return new stdClass();
     }
     return new stdClass();
 }
@@ -121,6 +123,9 @@ $GLOBALS['result']->elapsedTime = microtime(true);
 $GLOBALS['result']->source = '';
 $GLOBALS['result']->total = 0;
 $GLOBALS['result']->date = '';
+$GLOBALS['result']->truedate = [];
+$GLOBALS['result']->trueschedulecount = [];
+$GLOBALS['result']->truestate = [];
 $GLOBALS['result']->gendersport = '';
 $GLOBALS['result']->state = '';
 $GLOBALS['result']->data = [];
@@ -147,11 +152,24 @@ try {
     }
     $url = 'https://www.maxpreps.com/list/schedules_scores.aspx?date=' . $date . '&gendersport=' . $gendersport . '&state=' . $state;
     $document = file_get_html($url);
+    // available date
     $availableDate = [];
+    $availableScheduleCount = [];
     foreach ($document->find('.month li > a') as $element) {
         $filterData = explode('&', explode('?', $element->href)[1]);
         $availableDate[] = explode('=', $filterData[0])[1];
+        $availableScheduleCount[]  = $element->attr['data-contest-count'];
     }
+    $GLOBALS['result']->truedate = $availableDate;
+    $GLOBALS['result']->trueschedulecount = $availableScheduleCount;
+
+    // available state
+    $availableState = [];
+    foreach ($document->find('#state_filter > option') as $element) {
+        $availableState[] = $element->value;
+    }
+    $GLOBALS['result']->truestate = $availableState;
+
     $currentInfo = '| ' . $GLOBALS['sportData'][$gendersport] . ' | ' . $GLOBALS['stateData'][$state] . ' | ' . $date;
     if (in_array($date, $availableDate)) {
         if (!(count($document->find('.no-data')) > 0)) {
@@ -164,7 +182,7 @@ try {
                 if (isset($_GET['index']) && isset($_GET['url'])) {
                     $GLOBALS['result']->total = 1;
                     $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $gendersport, $state, $_GET['url']);
-                    $GLOBALS['result']->message = 'Successfully load data ' . $currentInfo.' | '.$GLOBALS['result']->data->home.' vs '.$GLOBALS['result']->data->away;
+                    $GLOBALS['result']->message = 'Successfully load data ' . $currentInfo . ' | ' . $GLOBALS['result']->data->home . ' vs ' . $GLOBALS['result']->data->away;
                 } else {
                     $res = [];
                     for ($i = 0; $i < count($teams); $i++) {

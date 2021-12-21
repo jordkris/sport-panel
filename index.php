@@ -33,6 +33,7 @@
 	<link rel="stylesheet" id="google-font" href="//fonts.googleapis.com/css?family=Oswald|Open+Sans" type="text/css" media="all">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
 	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" rel="stylesheet" />
 
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/style.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="style-font" href="<?php echo $site_url; ?>/css/custom.css" type="text/css" media="all">
@@ -41,292 +42,351 @@
 </head>
 
 <body class="movie single">
-	<header>
-		<div class="navbar navbar-default navbar-fixed-top" style="background-color: #013369;">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar" aria-expanded="false">
-						<span class="icon-options-vertical">
-						</span>
-					</button>
-					<div class="navbar-brand">SPORT | <?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream
-					</div>
+	<div class="navbar navbar-default" style="background-color: #013369;top:0;position:sticky;z-index:100;">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar" aria-expanded="false">
+					<span class="icon-options-vertical">
+					</span>
+				</button>
+				<div class="navbar-brand"><a href="<?= $site_url; ?>">SPORT | <?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream</a>
 				</div>
-				<nav class="collapse navbar-collapse" id="main-navbar">
-					<ul class="nav navbar-nav navbar-right">
-						<?php
-						$topbar = json_decode(file_get_contents('topbar.json'), true);
-						$sportData = json_decode(file_get_contents('sportData.json'), true);
-						$stateData = json_decode(file_get_contents('stateData.json'), true);
-						$stateKey = array_keys($stateData);
-						$url = '?';
-						$url .= isset($_GET['startdate']) ? 'startdate=' . $_GET['startdate'] . '&' : '';
-						$url .= isset($_GET['enddate']) ? 'enddate=' . $_GET['enddate'] . '&' : '';
-						$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
-						$counter = 0;
-						foreach ($topbar as $t) {
-							if ($counter < 5) {
-								$link = $url . 'gendersport=' . $t;
-						?>
-								<li class="top-menu <?= $counter == 0 ? 'active' : ''; ?>">
-									<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
-										<span class="icon fa fa-play-circle-o"></span><?= $sportData[$t]; ?>
-									</a>
-								</li>
-						<?php $counter++;
-							} else {
-								break;
-							}
-						} ?>
-						<?php for ($i = 0; $i < 5; $i++) { ?>
-							<li class="loading-menu" style="display:none;">
-								<a href="javascript:void(0)">
-									<span class="icon fa fa-play-circle-o"></span>
-									<span class="loading-label"></span>
+			</div>
+			<nav class="collapse navbar-collapse" id="main-navbar">
+				<ul class="nav navbar-nav navbar-right">
+					<?php
+					$topbar = json_decode(file_get_contents('topbar.json'), true);
+					$sportData = json_decode(file_get_contents('sportData.json'), true);
+					// $url = '?';
+					// $url .= isset($_GET['startdate']) ? 'startdate=' . $_GET['startdate'] . '&' : '';
+					// $url .= isset($_GET['enddate']) ? 'enddate=' . $_GET['enddate'] . '&' : '';
+					// $url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
+					$counter = 0;
+					foreach ($topbar as $t) {
+						if ($counter < 5) {
+							// $link = $url . 'gendersport=' . $t;
+					?>
+							<li class="top-menu">
+								<!-- <a href="javascript:void(0)" onclick="changeParam('')"> -->
+								<a id="<?= str_replace(',', '-', $t); ?>" href="javascript:void(0)" class="gender-sport">
+									<span class="icon fa fa-play-circle-o"></span><?= $sportData[$t]; ?>
 								</a>
 							</li>
-						<?php } ?>
-						<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">More <span class="caret"></span></a>
-							<ul class="dropdown-menu" id="more-menu">
-								<?php
-								$url = '?';
-								$url .= isset($_GET['startdate']) ? 'startdate=' . $_GET['startdate'] . '&' : '';
-								$url .= isset($_GET['enddate']) ? 'enddate=' . $_GET['enddate'] . '&' : '';
-								$url .= isset($_GET['state']) ? 'state=' . $_GET['state'] . '&' : '';
-								$counter = 0;
-								foreach ($topbar as $t) {
-									$link = $url . 'gendersport=' . $t;
-								?>
-									<li>
-										<a href="javascript:void(0)" onclick="changeParam('<?= $link; ?>')">
-											<span class="icon fa fa-play-circle-o"></span><?= $sportData[$t]; ?>
-										</a>
-									</li>
-								<?php } ?>
-							</ul>
+					<?php $counter++;
+						} else {
+							break;
+						}
+					} ?>
+					<?php for ($i = 0; $i < 5; $i++) { ?>
+						<li class="loading-menu" style="display:none;">
+							<a href="javascript:void(0)">
+								<span class="icon fa fa-play-circle-o"></span>
+								<span class="loading-label"></span>
+							</a>
 						</li>
-					</ul>
-				</nav>
-			</div>
+					<?php } ?>
+					<!-- <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">More <span class="caret"></span></a></li> -->
+				</ul>
+			</nav>
 		</div>
-	</header>
+	</div>
 	<div id="main">
 		<div id="player">
 			<span class="player-cover">
 			</span>
-			<div class="container">
+			<!-- <div class="container">
 				<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" id="img-sport-left" />
 				<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" id="img-sport-right" />
-			</div>
+			</div> -->
 			<div class="container">
-				<div id="video" class="text-center">
+				<!-- <div id="video" class="text-center">
 					<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" style="width: 100%;" class="img-sport" />
+				</div> -->
+				<div id="video">
+					<div id="video-player" class="embed-responsive embed-responsive-16by9 video pointer nocontext">
+						<video style="object-fit: cover;" id="videoPlayer" class="embed-responsive-item img-sport" preload="none">
+							<p>Your browser doesn't support HTML5 video
+							</p>
+						</video>
+						<span class="spinner-wrapper">
+							<span class="vam">
+								<span class="spinner loading">
+								</span>
+							</span>
+						</span>
+						<span class="play-wrapper ease">
+							<span class="vam">
+								<span id="play_btn" class="play-btn-border ease">
+									<i class="fa fa-play-circle headline-round ease" aria-hidden="true">
+									</i>
+								</span>
+							</span>
+							<div class="media-controls ease">
+								<div id="leftControls" class="pull-left">
+									<button type="button" name="Play" class="btn icon-control-play" id="play_btn">
+									</button>
+									<button id="volumeInc_btn" name="Volume" class="btn icon-volume-2">
+									</button>
+									<button id="timeContainer" class="btn">
+										<i class="fa fa-circle" style="color:red">
+										</i>
+										<span class="dmax">LIVE
+										</span>
+									</button>
+								</div>
+								<div id="progressContainer">
+									<span id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+									</span>
+								</div>
+								<div id="rightControls" class="pull-right">
+									<div id="sliderContainer">
+										<div id="slider" class="ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all">
+											<div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="height: 50%;">
+											</div>
+											<span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0" style="bottom: 50%;">
+											</span>
+										</div>
+									</div>
+									<div id="setting_btn" class="btn-group dropup">
+										<button name="Setting" class="btn icon-settings dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+											<span class="glyphicon glyphicon-hd-video">
+											</span>
+										</button>
+										<ul class="dropdown-menu dropdown-menu-right">
+											<li class="hq active">HD 1080p
+											</li>
+											<li class="hq">HD 720p
+											</li>
+										</ul>
+									</div>
+									<button id="fullscreen_btn" name="Fullscreen" class="btn icon-size-fullscreen pull-right">
+									</button>
+								</div>
+							</div>
+					</div>
 				</div>
 			</div>
-			<div class="text-center">
-				<img style="max-width:100%;height:auto;padding: 15px;" src="<?php echo $site_url; ?>/img/4k.png">
-			</div>
-			<br />
 		</div>
-		<div id="description" itemscope itemtype="https://schema.org/Movie">
-			<div class="container">
-				<div class="row">
-					<article id="post-400710" class="post col-md-12">
-						<header class="entry-header">
-							<div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-								<meta itemprop="worstRating" content="1">
-								<meta itemprop="bestRating" content="10">
-								<meta itemprop="ratingValue" content="4.7">
-								<meta itemprop="ratingCount" content="9">
-							</div>
-						</header>
-						<div class="entry-content">
-							<div class="col-md-offset-3">
-								<h3 style="color:#fffefc"><?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?>
-								</h3>
-							</div>
-							<div class="row">
-								<div class="col-md-3 text-center hidden-xs hidden-sm">
-									<img id="img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster img-sport">
-									<div class="rating-star" title="6.4 out of 10 stars" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star">
-										</i>
-										<i class="fa fa-star-o">
-										</i>
-										<i class="fa fa-star-o">
-										</i>
-										<div class="movie-rating">
-											<span itemprop="ratingValue">8.4
-											</span>/
-											<span itemprop="bestRating">10
-											</span> by
-											<span itemprop="ratingCount">12.281
-											</span> users
-										</div>
-									</div>
-								</div>
-								<br>
-								<div class="col-md-9">
-									<p class="lead" itemprop="description" style="text-align: justify;">UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
-									</p>
-								</div>
-							</div>
-							<br>
-							<div class="row" style="background-color: white;padding-top:10px;">
-								<div class="container">
-									<div class="row" style="margin-bottom: 20px;">
-										<div class="col-lg-4">
-											<ul id="loading-log"></ul>
-											<button id="clear-log" class="btn btn-danger"><i class="icon fa fa-trash"></i> Clear Log</button>
-											<span style="color:black;float:right;">Total Available Schedule : <span id="true-schedule">0</span></span>
-										</div>
-										<div class="col-lg-8">
-											<div class="row" style="color:black;margin-bottom: 20px;">
-												<div class="col-lg-3">
-													<label for="start-date">Start Date</label>
-													<input type="date" id="start-date" class="form-control">
-												</div>
-												<div class="col-lg-3">
-													<label for="end-date">End Date</label>
-													<input type="date" id="end-date" class="form-control">
-												</div>
-												<div class="col-lg-3">
-													<label for="threads">Threads</label>
-													<input type="number" id="threads" class="form-control" min="1" max="10" value="2">
-												</div>
-												<div class="col-lg-3"></div>
-												<div class="col-lg-12" style="margin-bottom:20px;margin-top:20px;">
-													<label for="state">State</label><br />
-													<select id="state" multiple="multiple" class="form-control">
-														<?php foreach ($stateData as $key => $val) { ?>
-															<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
-														<?php } ?>
-													</select>
-												</div>
-												<div class="col-lg-12">
-													<label for="progress-bar-url">URLs <span id="status-bar-url"></span></label><br />
-													<div id="progress-bar-url" class="progress-bar-striped">
-														<div style="width: 0%;">
-															<p>0%</p>
-														</div>
-													</div>
-												</div>
-												<div class="col-lg-12">
-													<label for="progress-bar-schedule">Schedules <span id="status-bar-schedule"></span></label><br />
-													<div id="progress-bar-schedule" class="progress-bar-striped">
-														<div style="width: 0%;">
-															<p>0%</p>
-														</div>
-													</div>
-												</div>
-												<div class="col-lg-12">
-													<button id="start-loading" class="btn btn-success"><i class="icon fa fa-play"></i> Start</button>
-													<button id="stop-loading" class="btn btn-danger" style="display:none;"><i class="icon fa fa-stop"></i> Stop</button>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="table-responsive">
-										<table id="schedule-table" class="table display table-stripped" style="width:100%">
-											<thead>
-												<tr>
-													<th>#</th>
-													<th>Home</th>
-													<th>Away</th>
-													<th class="text-center">Description</th>
-													<th>Date</th>
-													<th>Gender Sport</th>
-													<th>State</th>
-												</tr>
-											</thead>
-										</table>
+		<div class="text-center">
+			<img style="max-width:100%;height:auto;padding: 15px;" src="<?php echo $site_url; ?>/img/4k.png">
+		</div>
+		<br />
+	</div>
+	<div id="description" itemscope itemtype="https://schema.org/Movie">
+		<div class="container">
+			<div class="row">
+				<article id="post-400710" class="post col-md-12">
+					<header class="entry-header">
+						<div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+							<meta itemprop="worstRating" content="1">
+							<meta itemprop="bestRating" content="10">
+							<meta itemprop="ratingValue" content="4.7">
+							<meta itemprop="ratingCount" content="9">
+						</div>
+					</header>
+					<div class="entry-content">
+						<div class="col-md-offset-3">
+							<h3 style="color:#fffefc"><?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?>
+							</h3>
+						</div>
+						<div class="row">
+							<div class="col-md-3 text-center hidden-xs hidden-sm">
+								<img id="img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster">
+								<div class="rating-star" title="6.4 out of 10 stars" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star">
+									</i>
+									<i class="fa fa-star-o">
+									</i>
+									<i class="fa fa-star-o">
+									</i>
+									<div class="movie-rating">
+										<span itemprop="ratingValue">8.4
+										</span>/
+										<span itemprop="bestRating">10
+										</span> by
+										<span itemprop="ratingCount">12.281
+										</span> users
 									</div>
 								</div>
 							</div>
 							<br>
-							<div class="row">
-								<div class="col-md-12">
-									<section id="external-download" style="display:block!important;visibility:visible!important;opacity:1!important">
-										<h3 class="widget-title" style="display:block!important;visibility:visible!important;opacity:1!important">
-											<span>Alternative Stream Link
-											</span>
-										</h3>
-										<a href="#" data-toggle="modal" data-target="#player-modal">
-											<div class="section-content" style="display:block!important;visibility:visible!important;opacity:1!important">
-												<ul id="ext-download" style="display:block!important;visibility:visible!important;opacity:1!important">
-													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-															<span>
-																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Flash P2P
-															</span>
-														</span>
-														<span class="ext-right pull-right">
-															<span class="ext-speed nomobile">
-																<script type="text/javascript">
-																	document.write(Math.floor(Math.random() * 3200));
-																</script> Kb/s
-															</span>
-															<span class="ext-icon label label-primary"> STREAM
-															</span>
-														</span>
-													</li>
-													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-															<span>
-																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Castasap
-															</span>
-														</span>
-														<span class="ext-right pull-right">
-															<span class="ext-speed nomobile">
-																<script type="text/javascript">
-																	document.write(Math.floor(Math.random() * 2200));
-																</script> Kb/s
-															</span>
-															<span class="ext-icon label label-primary"> STREAM
-															</span>
-														</span>
-													</li>
-													<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
-														<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
-															<span>
-																<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Liveshare
-															</span>
-														</span>
-														<span class="ext-right pull-right">
-															<span class="ext-speed nomobile">
-																<script type="text/javascript">
-																	document.write(Math.floor(Math.random() * 2200));
-																</script> Kb/s
-															</span>
-															<span class="ext-icon label label-primary"> STREAM
-															</span>
-														</span>
-													</li>
-												</ul>
+							<div class="col-md-9">
+								<p class="lead" itemprop="description" style="text-align: justify;">UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
+								</p>
+							</div>
+						</div>
+						<br>
+						<div class="row" style="background-color: white;padding-top:10px;">
+							<div class="container">
+								<div class="row" style="margin-bottom: 20px;">
+									<div class="col-lg-2">
+										<!-- <ul id="loading-log"></ul> -->
+										<label for="gender-sport">Gender Sport</label>
+										<!-- <input type="hidden" id="gender-sport" value="" /> -->
+										<select id="gender-sport" class="form-control real-data">
+											<?php
+											foreach ($sportData as $key => $val) {
+											?>
+												<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
+											<?php } ?>
+										</select>
+									</div>
+									<div class="col-lg-2">
+										<!-- <ul id="loading-log"></ul> -->
+										<label for="state">State</label>
+										<!-- <select id="state" multiple="multiple" class="category-menu" size="10" style="width:100%;"> -->
+										<select id="state" class="form-control real-data">
+											<?php
+											$stateData = json_decode(file_get_contents('stateData.json'), true);
+											$stateKey = array_keys($stateData);
+											foreach ($stateData as $key => $val) {
+											?>
+												<!-- <option value="" style="color:black;" class="child"></option> -->
+												<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
+											<?php } ?>
+										</select>
+									</div>
+									<div class="col-lg-3">
+										<label for="start-date">Start Date <span id="status-bar-start-date" class="status-bar"></span></label>
+										<input id="start-date" type="text" class="form-control real-data" readonly>
+									</div>
+									<div class="col-lg-3">
+										<label for="end-date">End Date <span id="status-bar-end-date" class="status-bar"></span></label>
+										<input id="end-date" type="text" class="form-control real-data" readonly>
+									</div>
+									<div class="col-lg-2">
+										<label for="threads">Threads</label>
+										<input type="number" id="threads" class="form-control real-data" min="1" max="10" value="4">
+									</div>
+								</div>
+								<div class="row" style="margin-bottom: 20px;">
+									<div class="col-lg-6">
+										<label for="progress-bar-url">URLs <span id="status-bar-url" class="status-bar"></span></label><br />
+										<div id="progress-bar-url" class="progress-bar-striped">
+											<div style="width: 0%;">
+												<p>0%</p>
 											</div>
-									</section>
-									</a>
+										</div>
+
+									</div>
+									<div class="col-lg-6">
+										<label for="progress-bar-schedule">Schedules <span id="status-bar-schedule" class="status-bar"></span></label><br />
+										<div id="progress-bar-schedule" class="progress-bar-striped">
+											<div style="width: 0%;">
+												<p>0%</p>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-6">
+										<span style="color:black;float:left;">Status : <span id="status-bar-all"></span></span>
+										<!-- <button id="start-loading" class="btn btn-success"><i class="icon fa fa-play"></i> Start</button>
+										<button id="stop-loading" class="btn btn-danger" style="display:none;"><i class="icon fa fa-stop"></i> Stop</button> -->
+									</div>
+									<div class="col-lg-6">
+										<span style="color:black;float:right;">Available Schedule : <span id="true-schedule">0</span></span>
+									</div>
+								</div>
+								<div class="table-responsive">
+									<table id="schedule-table" class="table display table-stripped" style="width:100%">
+										<thead>
+											<tr>
+												<th>#</th>
+												<th>Home</th>
+												<th>Away</th>
+												<th class="text-center">Description</th>
+												<th>Date</th>
+												<th>Gender Sport</th>
+												<th>State</th>
+											</tr>
+										</thead>
+									</table>
 								</div>
 							</div>
 						</div>
-					</article>
-				</div>
+						<br>
+						<div class="row">
+							<div class="col-md-12">
+								<section id="external-download" style="display:block!important;visibility:visible!important;opacity:1!important">
+									<h3 class="widget-title" style="display:block!important;visibility:visible!important;opacity:1!important">
+										<span>Alternative Stream Link
+										</span>
+									</h3>
+									<a href="#" data-toggle="modal" data-target="#player-modal">
+										<div class="section-content" style="display:block!important;visibility:visible!important;opacity:1!important">
+											<ul id="ext-download" style="display:block!important;visibility:visible!important;opacity:1!important">
+												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span>
+															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Flash P2P
+														</span>
+													</span>
+													<span class="ext-right pull-right">
+														<span class="ext-speed nomobile">
+															<script type="text/javascript">
+																document.write(Math.floor(Math.random() * 3200));
+															</script> Kb/s
+														</span>
+														<span class="ext-icon label label-primary"> STREAM
+														</span>
+													</span>
+												</li>
+												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span>
+															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Castasap
+														</span>
+													</span>
+													<span class="ext-right pull-right">
+														<span class="ext-speed nomobile">
+															<script type="text/javascript">
+																document.write(Math.floor(Math.random() * 2200));
+															</script> Kb/s
+														</span>
+														<span class="ext-icon label label-primary"> STREAM
+														</span>
+													</span>
+												</li>
+												<li class="ext-row pointer" style="display:block!important;visibility:visible!important;opacity:1!important">
+													<span class="ext-title ease" style="display:block!important;visibility:visible!important;opacity:1!important">
+														<span>
+															<img src="<?php echo $site_url; ?>/img/ff.gif" width="20" height="20">&nbsp;Liveshare
+														</span>
+													</span>
+													<span class="ext-right pull-right">
+														<span class="ext-speed nomobile">
+															<script type="text/javascript">
+																document.write(Math.floor(Math.random() * 2200));
+															</script> Kb/s
+														</span>
+														<span class="ext-icon label label-primary"> STREAM
+														</span>
+													</span>
+												</li>
+											</ul>
+										</div>
+								</section>
+								</a>
+							</div>
+						</div>
+					</div>
+				</article>
 			</div>
 		</div>
+	</div>
 	</div>
 	<div id="player-modal" class="modal fade nocontext">
 		<div class="modal-dialog">
@@ -571,10 +631,11 @@
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js">
 	</script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/scripts.js">
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
 	</script>
+	<script type="text/javascript" src="<?php echo $site_url; ?>/js/scripts.min.js"></script>
 	<?php //include('histats.php'); 
 	?>
 </body>

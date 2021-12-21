@@ -19,22 +19,52 @@
     filter: blur(5px);
 }
 
-#more-menu {
+
+/* #more-menu {
     max-height: 500px;
     border: 1px solid #ccc;
     overflow: auto;
-}
+} */
 
-#loading-log {
+.category-menu {
     height: 200px;
     max-height: 200px;
     border: 1px solid #000;
     overflow: auto;
 }
 
-#loading-log li {
+.category-menu .child {
     border: 1px solid #000;
     padding: 5px 5px 5px 5px;
+}
+
+
+/* #more-menu li:hover {
+    background-color: #000 !important;
+}
+
+#more-menu a:hover {
+    color: #fff !important;
+} */
+
+.category-menu a {
+    color: #000 !important;
+}
+
+.category-menu .active {
+    background-color: #000 !important;
+}
+
+.category-menu .active>a {
+    color: #fff !important;
+}
+
+.category-menu .hover {
+    background-color: #000 !important;
+}
+
+.category-menu .hover>a {
+    color: #fff !important;
 }
 
 .progress-bar-striped {
@@ -85,4 +115,28 @@
 
 .select2-results li {
     color: #000000;
+}
+
+.table-condensed {
+    color: #000;
+}
+
+.date-highlighted {
+    color: #fff;
+    font-weight: bold;
+    background-color: green;
+    border-radius: 100% !important;
+    transition: 0.3s ease;
+}
+
+.date-highlighted:hover {
+    color: #000 !important;
+}
+
+.status-bar {
+    color: blue;
+}
+
+option:disabled {
+    text-decoration: line-through;
 }
