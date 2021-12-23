@@ -44,14 +44,14 @@
 
 <body class="movie single">
 	<div class="navbar navbar-default" style="background-color: #013369;top:0;position:sticky;z-index:100;">
-		<div class="container">
+		<div class="container" style="height:65px;">
 			<div class="navbar-header">
+				<div class="navbar-brand" style="position:absolute;"><a href="<?= $site_url; ?>">SPORT | <?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream</a>
+				</div>
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar" aria-expanded="false">
 					<span class="icon-options-vertical">
 					</span>
 				</button>
-				<div class="navbar-brand"><a href="<?= $site_url; ?>">SPORT | <?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream</a>
-				</div>
 			</div>
 			<nav class="collapse navbar-collapse" id="main-navbar">
 				<ul class="nav navbar-nav navbar-right">
