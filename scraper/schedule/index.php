@@ -66,6 +66,11 @@ function dateToText($date)
     return date("M jS, Y", strtotime(implode('-', [$year, $month, $day])));
 }
 
+function trimIconUrl($url)
+{
+    return str_replace("');", '', str_replace("background-image:url('", "", $url));
+}
+
 function prt($string)
 {
     echo $string . PHP_EOL;
@@ -89,6 +94,11 @@ function getScheduleUrl($i, $document)
             if (!(strtolower($home) == 'tba' || strtolower($away) == 'tba')) {
                 $singleRes->index = $i;
                 $singleRes->url = $link;
+                $singleRes->home = $home;
+                $singleRes->away = $away;
+                $teamsArr = explode('-vs-', end(explode('/', explode('.htm?', $link)[0])));
+                $singleRes->identicHome = strtolower(str_replace('-', ' ', $teamsArr[0]));
+                $singleRes->identicAway = strtolower(str_replace('-', ' ', $teamsArr[1]));
                 return $singleRes;
             }
         }
@@ -98,7 +108,7 @@ function getScheduleUrl($i, $document)
     return new stdClass();
 }
 
-function getSingleScheduleData($i, $document, $date, $gendersport, $state, $url)
+function getSingleScheduleData($i, $document, $url)
 {
     $singleRes = new stdClass();
     $contest = $document->find('[data-teams]', $i)->find('.teams > li > .name');
@@ -106,11 +116,21 @@ function getSingleScheduleData($i, $document, $date, $gendersport, $state, $url)
         $singleRes->home = html_entity_decode(trim($contest[0]->text()));
         $singleRes->away = html_entity_decode(trim($contest[1]->text()));
         if (!(strtolower($singleRes->home) == 'tba' || strtolower($singleRes->away) == 'tba')) {
-            $singleRes->description = html_entity_decode(file_get_html($url)->find('p.contest-description', 0)->text());
-            $singleRes->date = dateToText($date);
-            $singleRes->gendersport = $GLOBALS['sportData'][$gendersport];
-            $singleRes->state = $GLOBALS['stateData'][$state];
+            $doc = file_get_html($url);
             $singleRes->url = $url;
+            $singleRes->description = html_entity_decode($doc->find('p.contest-description', 0)->text());
+
+            $singleRes->homeMascot = $doc->find('.team-details__mascot', 0) ? $doc->find('.team-details__mascot', 0)->text() : '';
+            $singleRes->awayMascot = $doc->find('.team-details__mascot', 1) ? $doc->find('.team-details__mascot', 1)->text() : '';
+
+            $singleRes->homeIcon = trimIconUrl($doc->find('.team-details__mascot-image > span', 0)->style);
+            $singleRes->awayIcon = trimIconUrl($doc->find('.team-details__mascot-image > span', 1)->style);
+
+            $singleRes->homeScore = html_entity_decode($doc->find('.team-details__standings-or-score', 0)->text());
+            $singleRes->awayScore = html_entity_decode($doc->find('.team-details__standings-or-score', 1)->text());
+
+            $teams = end(explode('/', explode('.htm?', $url)[0]));
+            $singleRes->match = str_replace('-', '+', $teams);
             return $singleRes;
         }
     }
@@ -181,7 +201,7 @@ try {
                 }
                 if (isset($_GET['index']) && isset($_GET['url'])) {
                     $GLOBALS['result']->total = 1;
-                    $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $date, $gendersport, $state, $_GET['url']);
+                    $GLOBALS['result']->data = getSingleScheduleData($_GET['index'], $document, $_GET['url']);
                     $GLOBALS['result']->message = 'Successfully load data ' . $currentInfo . ' | ' . $GLOBALS['result']->data->home . ' vs ' . $GLOBALS['result']->data->away;
                 } else {
                     $res = [];

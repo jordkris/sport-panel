@@ -93,8 +93,6 @@ let t = $('#schedule-table').DataTable({
         "className": "text-center"
     }, {
         "className": "text-center"
-    }, {
-        "className": "text-center"
     }]
 });
 $('th.text-justify').removeClass('text-justify').addClass('text-center');
@@ -106,67 +104,93 @@ t.on('order.dt search.dt', function() {
 
 // bootstrap datepicker
 // $('#start-date,#end-date').datepicker('setDate', new Date());
-async function handleTrueData(nearestMode = false) {
-    let today = new Date().toLocaleDateString();
-    let gendersport = $('#gender-sport').val();
-    let state = $('#state').val();
-    let singleAjax = $.ajax({
-        url: `${location.href.split('?')[0]}scraper/schedule/?date=${today}&gendersport=${gendersport}&state=${state}`,
-        type: 'GET',
-        beforeSend: () => {
-            $('#status-bar-start-date').html('(Processing...)');
-            $('#status-bar-end-date').html('(Processing...)');
-        },
-        success: (res) => {
-            // true date
-            $('#start-date,#end-date').datepicker('destroy');
-            // console.log(res.truedate);
-            $('#start-date,#end-date').datepicker({
-                format: 'mm/dd/yyyy',
-                autoclose: true,
-                inline: true,
-                // sideBySide: true,
-                beforeShowDay: (date) => {
-                    let calenderDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
-                    if ($.inArray(calenderDate, res.truedate) > -1) {
-                        return {
-                            classes: 'date-highlighted',
-                            tooltip: res.trueschedulecount[res.truedate.indexOf(calenderDate)] + ' schedule(s) available on this day'
-                        };
-                    } else {
-                        return {
-                            classes: '',
-                            tooltip: ''
-                        };
+async function handleTrueData(nearestMode = false, changeState = false) {
+    return new Promise((resolve, reject) => {
+        let today = getTodayDate(new Date());
+        let gendersport = $('#gender-sport').val();
+        let state = $('#state').val();
+        // if (state == 'all') {
+        // $('#start-date,#end-date').datepicker('destroy');
+        // $('#start-date,#end-date').datepicker({
+        //     format: 'mm/dd/yyyy',
+        //     autoclose: true,
+        //     inline: true,
+        //     // sideBySide: true,
+        // });
+        // $('#start-date').val(today);
+        // $('#end-date').val(today);
+        // $('#status-bar-start-date').html('');
+        // $('#status-bar-end-date').html('');
+        // resolve();
+        // } else {
+        let singleAjax = $.ajax({
+            url: `${location.href.split('?')[0]}scraper/schedule/?date=${today}&gendersport=${gendersport}&state=${state}`,
+            type: 'GET',
+            beforeSend: () => {
+                $('#status-bar-start-date').html('(Processing...)');
+                $('#status-bar-end-date').html('(Processing...)');
+            },
+            success: (res) => {
+                // true date
+                $('#start-date,#end-date').datepicker('destroy');
+                // console.log(res.truedate);
+                $('#start-date,#end-date').datepicker({
+                    format: 'mm/dd/yyyy',
+                    autoclose: true,
+                    inline: true,
+                    // sideBySide: true,
+                    beforeShowDay: (date) => {
+                        let calenderDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+                        if ($.inArray(calenderDate, res.truedate) > -1) {
+                            return {
+                                classes: 'date-highlighted',
+                                tooltip: res.trueschedulecount[res.truedate.indexOf(calenderDate)] + ' schedule(s) available on this day'
+                            };
+                        } else {
+                            return {
+                                classes: '',
+                                tooltip: ''
+                            };
+                        }
+                    }
+                });
+                if (nearestMode) {
+                    let nearestDate = detectNearestDate(today, res.truedate);
+                    $('#start-date').val(nearestDate);
+                    $('#end-date').val(nearestDate);
+                    // $('#start-date,#end-date').datepicker("update", nearestDate);
+                }
+                if (res.truedate.length) {
+                    $('#status-bar-start-date').html(`(minimum : ${handleCompareDate('min', today, res.truedate)})`);
+                    $('#status-bar-end-date').html(`(maximum : ${handleCompareDate('max', today, res.truedate)})`);
+                } else {
+                    $('#status-bar-start-date').html('(No Schedules Available!)');
+                    $('#status-bar-end-date').html('(No Schedules Available!)');
+                }
+                // true state
+
+                let arrayState = [...$('#state > option')];
+                let state;
+                if (changeState) {
+                    for (let i = arrayState.length - 1; i > 0; i--) {
+                        state = arrayState[i].getAttribute('value');
+                        if (!res.truestate.includes(state.toUpperCase())) {
+                            arrayState[i].style.display = 'none';
+                        } else {
+                            $('#state').val(state);
+                        }
                     }
                 }
-            });
-            if (nearestMode) {
-                let nearestDate = detectNearestDate(today, res.truedate);
-                $('#start-date').val(nearestDate);
-                $('#end-date').val(nearestDate);
+                resolve();
+            },
+            error: (e) => {
+                console.error(e);
+                reject(e);
             }
-            if (res.truedate.length) {
-                $('#status-bar-start-date').html(`(minimum : ${handleCompareDate('min', today, res.truedate)})`);
-                $('#status-bar-end-date').html(`(maximum : ${handleCompareDate('max', today, res.truedate)})`);
-            } else {
-                $('#status-bar-start-date').html('(No Schedules Available!)');
-                $('#status-bar-end-date').html('(No Schedules Available!)');
-            }
-            // true state
-
-            let arrayState = [...$('#state > option')];
-            for (let i = 0; i < arrayState.length; i++) {
-                if (!res.truestate.includes(arrayState[i].getAttribute('value').toUpperCase())) {
-                    arrayState[i].setAttribute('disabled', 'disabled');
-                }
-            }
-        },
-        error: (e) => {
-            console.error(e);
-        }
+        });
+        ajaxTemp.push(singleAjax);
+        // }
     });
-    ajaxTemp.push(singleAjax);
 }
 
 function detectNearestDate(chosenDate, arrayDate) {
@@ -345,17 +369,6 @@ async function loadMetadata(gendersport) {
     });
 }
 
-// async function changeParam(link) {
-//     window.history.pushState('page2', 'Title', link);
-//     $('.category-menu .child').removeClass('active');
-//     $('#' + id).addClass('active');
-//     let currentUrl = new URL(location.href).searchParams;
-//     let gendersport = currentUrl.get("gendersport");
-
-//     await loadSchedule(date, gendersport, state);
-// }
-
-
 // excecution data
 async function beginExecution() {
     console.log('click start');
@@ -370,7 +383,13 @@ async function abortExecution(force = true) {
             if (force) {
                 $('#status-bar-all').html(handleIcon('abort') + ' Execution has been aborted!');
             } else {
-                $('#status-bar-all').html(handleIcon('empty') + ' No schedules available!');
+                if (JSON.parse(localStorage.getItem('teams')).length == 0) {
+                    $('#status-bar-all').html(handleIcon('empty') + ' No schedules available!');
+                } else {
+                    alert('Match not found!');
+                    $('#status-bar-all').html(handleIcon('empty') + ' Match not found!');
+                    $('p#description').html(handleIcon('empty') + ' Match not found!');
+                }
             }
             handleProgressBar('#progress-bar-url', 0, 1);
             handleProgressBar('#progress-bar-schedule', 0, 1);
@@ -402,9 +421,7 @@ async function autoExecution() {
         let endDate = $('#end-date').val();
         if (startDate == '') throw new Error('Start date is empty');
         if (endDate == '') throw new Error('End date is empty');
-        console.log(startDate, endDate);
         let validDate = handleInvalidDate(startDate, endDate);
-        console.log(validDate);
         startDate = validDate.startDate;
         endDate = validDate.endDate;
         // if (new Date(startDate) > new Date(endDate)) {
@@ -416,30 +433,44 @@ async function autoExecution() {
         //gendersport
         let gendersport = $('#gender-sport').val();
         if (gendersport === '' || gendersport === null) {
-            location.href = '?gendersport=boys,football&state=al';
+            location.href = '?gendersport=boys,football';
             // throw new Error('Gendersport is empty');
+            // gendersport = 'boys,football';
+        } else {
+            if (currentUrl.get('gendersport') !== gendersport) {
+                location.href = '?gendersport=' + gendersport;
+            }
         }
         //state
         let state = $('#state').val();
         if (state === null || state.length === 0) {
-            location.href = '?gendersport=boys,football&state=al';
+            // location.href = '?gendersport=boys%2Cfootball&state=al';
             // throw new Error('State is empty');
-        };
+            state = 'all';
+        }
+        let stateArr = Object.keys(JSON.parse(localStorage.getItem('state-data')));
+        if (state !== 'all') {
+            stateArr = [state];
+        }
         //threads
         let threads = $('#threads').val();
         if (threads == '') throw new Error('Threads is empty');
-        currentUrl.set('gendersport', gendersport);
+        // currentUrl.set('gendersport', gendersport);
         // currentUrl.set('startdate', convertDate(startDate, true));
         // currentUrl.set('enddate', convertDate(endDate, true));
-        currentUrl.set('startdate', startDate);
-        currentUrl.set('enddate', endDate);
+        // currentUrl.set('startdate', startDate);
+        // currentUrl.set('enddate', endDate);
         // currentUrl.set('stateArr', state.join(','));
-        currentUrl.set('state', state);
-        currentUrl.set('threads', threads);
-        window.history.pushState('page2', 'Title', longUrl);
+        // currentUrl.set('state', state);
+        // currentUrl.set('threads', threads);
+        // window.history.pushState('page2', 'Title', longUrl);
+        localStorage.setItem('state', state);
+        localStorage.setItem('start-date', startDate);
+        localStorage.setItem('end-date', endDate);
+        localStorage.setItem('threads', threads);
         handleProgressBar('#progress-bar-url', 0, 1);
         handleProgressBar('#progress-bar-schedule', 0, 1);
-        await loadSchedule(allDate, gendersport, state, threads);
+        await loadSchedule(allDate, gendersport, stateArr, threads);
         // return { gendersport: gendersport, state: stateArr, startdate: startdate, enddate: enddate, threads: threads };
     } catch (e) {
         console.error(e);
@@ -454,14 +485,14 @@ setInterval(() => {
         $('#status-bar-url').html('');
         $('#status-bar-schedule').html('');
         showControlButton('start');
-        $('.real-data').prop('disabled', false);
+        // $('.real-data').prop('disabled', false);
         setTimeout(() => {
             $('#status-bar-all').html('');
         }, 3000);
     } else {
-        setTimeout(() => {
-            $('.real-data').prop('disabled', true);
-        }, 3000);
+        // setTimeout(() => {
+        //     $('.real-data').prop('disabled', true);
+        // }, 3000);
     }
 }, 1000)
 
@@ -478,95 +509,109 @@ async function getAllUrl(date, gendersport, state, threads) {
         loop = 1,
         counter = 0,
         tasks = [],
-        // total = date.length * state.length,
-        total = date.length,
+        total = (localStorage.getItem('state') == 'all') ? state.length : state.length * date.length,
+        // total = date.length,
         trueSchedule = 0,
         singleAjax;
-    console.log(date);
     return new Promise(async(resolve, reject) => {
         $('#status-bar-url').html('(Processing...)');
         $('#true-schedule').html(trueSchedule);
         $('#status-bar-all').html(handleIcon('loading') + ' Load all possible url...');
-        for (let x = 0; x < date.length; x++) {
-            // for (let y = 0; y < state.length; y++) {
-            if (localStorage.getItem('execution') == 'true') {
-                try {
-                    tasks.push(new Promise((resolve, reject) => {
-                        singleAjax = $.ajax({
-                            url: `${location.href.split('?')[0]}scraper/schedule/?date=${date[x]}&gendersport=${gendersport}&state=${state}`,
-                            type: 'GET',
-                            success: (res) => {
-                                if (localStorage.getItem('execution') == 'true') {
-                                    trueSchedule += res.total;
-                                    $('#true-schedule').html(trueSchedule);
-                                    handleLog('info', res.message);
-                                    counter++;
-                                    $('#status-bar-url').html(`(${counter} of ${total})`);
-                                    handleProgressBar('#progress-bar-url', counter, total);
-                                    resolve(res);
-                                } else {
-                                    reject('Execution aborted');
-                                }
-                                // if (res.status == 200) {
-                                // total += res.total;
-                                // } else {
-                                // }
-                            },
-                            error: (e) => {
-                                if (e.statusText === 'abort') {
-                                    reject('Execution aborted');
-                                }
-                                console.error(e);
-                            }
-                        });
-                        ajaxTemp.push(singleAjax);
-                    }));
-                    if (loop % threads == 0) {
-                        await Promise.all(tasks).then((val) => {
-                            if (localStorage.getItem('execution') == 'true') {
-                                tasks = [];
-                                allResult = allResult.concat(val);
-                                console.log(loop + ' tasks success!');
-                            } else {
-                                handleProgressBar('#progress-bar-url', 0, 1);
-                                handleProgressBar('#progress-bar-schedule', 0, 1);
-                                reject('Execution has been aborted');
-                            }
-                        }).catch((e) => {
-                            console.error(e);
-                        });
-                    }
-                    if (loop == date.length) {
-                        await Promise.all(tasks).then((val) => {
-                            if (localStorage.getItem('execution') == 'true') {
-                                tasks = [];
-                                allResult = allResult.concat(val);
-                                console.log(loop + ' tasks success!');
-                                $("#progress-bar-url > div").html("100% ✅");
-                                setTimeout(() => {
-                                    resolve(allResult);
-                                }, 3000);
-                            } else {
-                                handleProgressBar('#progress-bar-url', 0, 1);
-                                handleProgressBar('#progress-bar-schedule', 0, 1);
-                                reject('Execution has been aborted');
-                            }
-                        }).catch((e) => {
-                            console.error(e);
-                        });
-                    }
-                } catch (err) {
-                    handleLog('error', err);
-                    console.error(err);
-                } finally {
-                    loop++;
-                }
-            } else {
-                handleProgressBar('#progress-bar-url', 0, 1);
-                handleProgressBar('#progress-bar-schedule', 0, 1);
-                reject('Execution has been aborted');
+        for (let x = 0; x < state.length; x++) {
+            if (localStorage.getItem('state') == 'all') {
+                $('#state').val(state[x].toLowerCase());
+                await handleTrueData(true, false);
+                date = [$('#start-date').val()];
             }
-            // }
+            for (let y = 0; y < date.length; y++) {
+                if (localStorage.getItem('execution') == 'true') {
+                    try {
+                        tasks.push(new Promise((resolve, reject) => {
+                            singleAjax = $.ajax({
+                                url: `${location.href.split('?')[0]}scraper/schedule/?date=${date[y]}&gendersport=${gendersport}&state=${state[x]}`,
+                                type: 'GET',
+                                success: (res) => {
+                                    if (localStorage.getItem('execution') == 'true') {
+
+                                        handleLog('info', res.message);
+                                        counter++;
+                                        $('#status-bar-url').html(`(${counter} of ${total})`);
+                                        handleProgressBar('#progress-bar-url', counter, total);
+                                        // TODO : handle total filtered by match
+                                        let teams = JSON.parse(localStorage.getItem('teams'));
+                                        if (teams.length > 0) {
+                                            res.data = res.data.filter((v) => {
+                                                return (teams.includes(v.home) && teams.includes(v.away)) || (teams.includes(v.identicHome) && teams.includes(v.identicAway));
+                                            });
+                                            res.total = res.data.length;
+                                        }
+                                        trueSchedule += res.total;
+                                        $('#true-schedule').html(trueSchedule);
+                                        resolve(res);
+                                    } else {
+                                        reject('Execution aborted');
+                                    }
+                                    // if (res.status == 200) {
+                                    // total += res.total;
+                                    // } else {
+                                    // }
+                                },
+                                error: (e) => {
+                                    if (e.statusText === 'abort') {
+                                        reject('Execution aborted');
+                                    }
+                                    console.error(e);
+                                }
+                            });
+                            ajaxTemp.push(singleAjax);
+                        }));
+                        if (loop % threads == 0) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    allResult = allResult.concat(val);
+                                    console.log(loop + ' tasks success!');
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    reject('Execution has been aborted');
+                                }
+                            }).catch((e) => {
+                                console.error(e);
+                            });
+                        }
+                        if (loop == total) {
+                            await Promise.all(tasks).then((val) => {
+                                if (localStorage.getItem('execution') == 'true') {
+                                    tasks = [];
+                                    allResult = allResult.concat(val);
+                                    console.log(loop + ' tasks success!');
+                                    $("#progress-bar-url > div").html("100% ✅");
+                                    if (localStorage.getItem('state') === 'all') $('#state').val('all');
+                                    setTimeout(() => {
+                                        resolve(allResult);
+                                    }, 3000);
+                                } else {
+                                    handleProgressBar('#progress-bar-url', 0, 1);
+                                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                                    reject('Execution has been aborted');
+                                }
+                            }).catch((e) => {
+                                console.error(e);
+                            });
+                        }
+                    } catch (err) {
+                        handleLog('error', err);
+                        console.error(err);
+                    } finally {
+                        loop++;
+                    }
+                } else {
+                    handleProgressBar('#progress-bar-url', 0, 1);
+                    handleProgressBar('#progress-bar-schedule', 0, 1);
+                    reject('Execution has been aborted');
+                }
+            }
         }
     });
 }
@@ -595,15 +640,29 @@ async function getAllSchedule(allUrl, threads) {
                                 success: (r) => {
                                     if (localStorage.getItem('execution') == 'true') {
                                         if (r.status == 200) {
+                                            let home = handleHtmlTeams({
+                                                icon: r.data.homeIcon,
+                                                name: r.data.home,
+                                                mascot: r.data.homeMascot,
+                                                score: r.data.homeScore
+                                            });
+                                            let away = handleHtmlTeams({
+                                                icon: r.data.awayIcon,
+                                                name: r.data.away,
+                                                mascot: r.data.awayMascot,
+                                                score: r.data.awayScore
+                                            });
                                             t.row.add([
                                                 '',
-                                                r.data.home,
-                                                r.data.away,
+                                                home,
+                                                away,
                                                 r.data.description,
-                                                r.data.date,
-                                                r.data.gendersport,
-                                                r.data.state
+                                                r.date,
+                                                handleLinkTeams(r)
                                             ]).draw(false);
+                                            if (JSON.parse(localStorage.getItem('teams')).length > 0) {
+                                                $('p#description').text(r.data.description);
+                                            }
                                             handleLog('info', r.message);
                                             counter++;
                                             $('#status-bar-schedule').html(`(${counter} of ${total})`);
@@ -737,13 +796,50 @@ function handleLog(status, message) {
     $('#loading-log').prop('scrollTop', 0);
 }
 
+function handleHtmlTeams(data) {
+    return `
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="magic-box">
+                <img src="${data.icon}" class="magic-image" />
+            </div>
+            <div>${data.name} (${data.mascot})</div>
+            <div>${data.score}</div>
+        </div>
+    </div>`;
+}
+
+function handleLinkTeams(r) {
+    let replaceWithPlus = (data) => {
+        return data.replaceAll(' ', '+');
+    };
+    return `
+    <ul>
+        <ol>
+            <a href="${location.href.split('?')[0]}?gendersport=${r.gendersport}&match=${r.data.match}" class="btn btn-success">
+                <i class="icon fa fa-external-link-alt"></i> Main
+            </a>
+        </ol>
+        <ol>
+            <a href="${location.href.split('?')[0]}?gendersport=${r.gendersport}&match=${replaceWithPlus(r.data.home + ' vs ' + r.data.away)}" class="btn btn-primary">
+                <i class="icon fa fa-external-link-alt"></i> Alternative 1
+            </a>
+        </ol>
+        <ol>
+            <a href="${location.href.split('?')[0]}?gendersport=${r.gendersport}&match=${replaceWithPlus(r.data.away + ' vs ' + r.data.home)}" class="btn btn-info">
+                <i class="icon fa fa-external-link-alt"></i> Alternative 2
+            </a>
+        </ol>
+    </ul>`;
+}
+
 function getDaysArray(start, end) {
     for (var arr = [], dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
         arr.push(new Date(dt));
     }
     // return arr;
     return arr.map((v) => {
-        return v.toLocaleDateString();
+        return getTodayDate(v);
         // let date = v.toISOString().slice(0, 10).split('-');
         // return [date[1], date[2], date[0]].join('/');
     });
@@ -788,6 +884,13 @@ function handleInvalidDate(startDate, endDate) {
     return { startDate: $('#start-date').val(), endDate: $('#end-date').val(), case: caseDate };
 }
 
+function getTodayDate(date) {
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    return [month < 10 ? '0' + month : month, day < 10 ? '0' + day : day, year].join('/');
+}
+
 function handleIcon(icon) {
     let res;
     switch (icon) {
@@ -800,7 +903,7 @@ function handleIcon(icon) {
             res = '<i class="icon fa fa-stop"></i>';
             break;
         case 'empty':
-            $('#status-bar-all').css('color', '#CCCC00');
+            $('#status-bar-all').css('color', 'red');
             res = '<i class="icon fa fa-exclamation-triangle"></i>';
             break;
         case 'done':
@@ -825,11 +928,10 @@ async function loadData(options) {
     //     task2 = [];
     // if (abort) task1.push();
     // if (metadata)
-    Promise.all(options.abort ? [await abortExecution()] : []).then(() => {
-        handleTrueData(options.nearestMode);
-    }).then(async() => {
-        Promise.all(options.metadata ? [await loadMetadata(gendersport), await handleLocalTopbar(true, gendersport)] : []).then(() => {
-            console.log('test');
+    Promise.all(options.abort ? [await abortExecution()] : []).then(async() => {
+        $('.real-data').prop('disabled', true);
+        Promise.all(options.metadata ? [await handleTrueData(options.nearestMode, options.changeState), await loadMetadata(gendersport), await handleLocalTopbar(true, gendersport)] : [await handleTrueData(options.nearestMode, options.changeState)]).then(() => {
+            $('.real-data').prop('disabled', false);
             autoExecution();
         }).catch(() => {
             console.error(e);
@@ -844,37 +946,74 @@ async function loadData(options) {
 
 //start up
 async function customStartUp() {
+    showControlButton('stop');
     let currentUrl = new URL(location.href).searchParams;
-    // let today = new Date().toISOString().split('T')[0];
-    let today = new Date().toLocaleDateString();
+    let today = getTodayDate(new Date());
 
-    if (currentUrl.get("gendersport") === '' || currentUrl.get("gendersport") === null) {
-        window.history.pushState('page2', 'Title', '?gendersport=boys,football&state=al');
-        $('#gender-sport').val('boys-football');
+    // gendersport
+    if (currentUrl.get('gendersport') === '' || currentUrl.get('gendersport') === null) {
+        location.href = '?gendersport=boys,football';
+        // $('#gender-sport').val('boys,football');
+        // localStorage.setItem('gender-sport', 'boys,football');
     } else {
         // $('#' + currentUrl.get("gendersport").replace(',', '')).addClass('active');
-        $('#gender-sport').val(currentUrl.get("gendersport"));
+        $('#gender-sport').val(currentUrl.get('gendersport'));
     }
-    if (currentUrl.get('state') !== null) {
-        $('#state').val(currentUrl.get('state'));
+
+    // state
+    if (localStorage.getItem('state') === null) {
+        // window.history.pushState('page2', 'Title', '?gendersport=boys,football&state=al');
+        $('#state').val('all');
+        localStorage.setItem('state', 'all');
     } else {
-        window.history.pushState('page2', 'Title', '?gendersport=boys,football&state=al');
-        $('#gender-sport').val('boys,football');
+        $('#state').val(localStorage.getItem('state'));
     }
-    if (currentUrl.get('startdate') === null) {
+
+    // date
+    if (localStorage.getItem('start-date') === null) {
         $('#start-date').val(today);
         localStorage.setItem('start-date', today);
-    } else {
-        $('#start-date').val(currentUrl.get('startdate'));
-        localStorage.setItem('start-date', currentUrl.get('startdate'));
     }
-    if (currentUrl.get('enddate') === null) {
+    // else {
+    //     $('#start-date').val(localStorage.getItem('start-date'));
+    // }
+    if (localStorage.getItem('end-date') === null) {
         $('#end-date').val(today);
         localStorage.setItem('end-date', today);
-    } else {
-        $('#end-date').val(currentUrl.get('enddate'));
-        localStorage.setItem('end-date', currentUrl.get('enddate'));
     }
+    // else {
+    //     $('#end-date').val(localStorage.getItem('end-date'));
+    // }
+
+    //match
+    if (currentUrl.get('match') === '' || currentUrl.get('match') === null) {
+        localStorage.setItem('teams', JSON.stringify([]));
+        localStorage.setItem('is-match', 'true');
+    } else {
+        // format checking
+        let match = currentUrl.get('match').toLowerCase();
+        if (match.includes(' vs ')) {
+            let teams = match.split(' vs ');
+            if (teams[0] != '' && teams[1] != '') {
+                localStorage.setItem('is-match', 'true');
+                localStorage.setItem('teams', JSON.stringify(teams));
+            } else {
+                localStorage.setItem('is-match', 'false');
+            }
+        } else {
+            localStorage.setItem('is-match', 'false');
+        }
+    }
+    console.log(JSON.parse(localStorage.getItem('teams')));
+
+    // threads
+    if (localStorage.getItem('threads') === null) {
+        $('#threads').val(4);
+        localStorage.setItem('threads', 4);
+    } else {
+        $('#threads').val(localStorage.getItem('threads'));
+    }
+
     // console.clear();
 }
 
@@ -884,12 +1023,20 @@ async function startUp() {
     // handleLog('info', 'Loading metadata...');
     // await loadMetadata(gendersport);
     // handleLog('info', 'Loading topbar data...');
-    await handleLocalTopbar();
     // if (gendersport) {
     //     await handleLocalTopbar(true, gendersport);
     // }
+    await handleLocalTopbar();
     await customStartUp();
-    await loadData({ abort: false, nearestMode: true, metadata: true });
+    if (localStorage.getItem('is-match') == 'true') {
+        await loadData({ abort: false, nearestMode: true, changeState: false, metadata: true });
+    } else {
+        alert('Incorrect format for "match" parameter! Example : "match=Team+A+vs+Team+B". Substring "+vs+" must required!');
+        let gendersport = $('#gender-sport').val();
+        await loadMetadata(gendersport);
+        await handleLocalTopbar(true, gendersport);
+        showControlButton('start');
+    }
     // await loadSchedule(date, gendersport, state);
 }
 
@@ -903,10 +1050,15 @@ $(document).ready(() => {
     // $('.real-data').change(async() => {
     //     loadData(true);
     // });
-    $('#gender-sport,#state').focus(() => {
+    $('#gender-sport').focus(() => {
         abortExecution();
     }).change(async() => {
-        loadData({ abort: true, nearestMode: true, metadata: true });
+        loadData({ abort: true, nearestMode: true, changeState: true, metadata: false });
+    });
+    $('#state').focus(() => {
+        abortExecution();
+    }).change(async() => {
+        loadData({ abort: true, nearestMode: true, changeState: false, metadata: false });
     });
     $('#start-date,#end-date,#threads').focus(() => {
         // let today = new Date().toLocaleDateString();
@@ -914,7 +1066,7 @@ $(document).ready(() => {
         // handleTrueData();
         abortExecution();
     }).change(async() => {
-        loadData({ abort: true, nearestMode: false, metadata: false });
+        loadData({ abort: true, nearestMode: false, changeState: false, metadata: false });
     });
     $('.gender-sport').click((e) => {
         let gendersport = e.target.id;

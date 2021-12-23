@@ -28,7 +28,8 @@
 	<meta property="og:site_name" content="Stream Livefull">
 	<link rel="stylesheet" id="bootstrap-css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="jasny-css" href="//cdnjs.cloudflare.com/ajax/libs/jasny-bootstrap/3.1.3/css/jasny-bootstrap.min.css" type="text/css" media="all">
-	<link rel="stylesheet" id="awesome-css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all">
+	<!-- <link rel="stylesheet" id="awesome-css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all"> -->
+	<script src="https://kit.fontawesome.com/5e59a4bfec.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" id="simple-css" href="//cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="google-font" href="//fonts.googleapis.com/css?family=Oswald|Open+Sans" type="text/css" media="all">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
@@ -185,10 +186,6 @@
 						</div>
 					</header>
 					<div class="entry-content">
-						<div class="col-md-offset-3">
-							<h3 style="color:#fffefc"><?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?>
-							</h3>
-						</div>
 						<div class="row">
 							<div class="col-md-3 text-center hidden-xs hidden-sm">
 								<img id="img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster">
@@ -223,10 +220,12 @@
 									</div>
 								</div>
 							</div>
-							<br>
 							<div class="col-md-9">
-								<p class="lead" itemprop="description" style="text-align: justify;">UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
-								</p>
+								<h3 style="color:#fffefc;margin-top:0;"><?= isset($_GET["match"]) ? htmlspecialchars($_GET["match"]) : 'Match is empty'; ?></h3>
+								<!-- <p class="lead" itemprop="description" style="text-align: justify;">
+									UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
+								</p> -->
+								<p id="description" class="lead" itemprop="description" style="text-align: justify;"><?= isset($_GET["match"]) ? 'Loading...' : 'Description is empty'; ?></p>
 							</div>
 						</div>
 						<br>
@@ -235,7 +234,7 @@
 								<div class="row" style="margin-bottom: 20px;">
 									<div class="col-lg-2">
 										<!-- <ul id="loading-log"></ul> -->
-										<label for="gender-sport">Gender Sport</label>
+										<label for="gender-sport"><i class="fas fa-running"></i> Gender Sport</label>
 										<!-- <input type="hidden" id="gender-sport" value="" /> -->
 										<select id="gender-sport" class="form-control real-data">
 											<?php
@@ -247,29 +246,29 @@
 									</div>
 									<div class="col-lg-2">
 										<!-- <ul id="loading-log"></ul> -->
-										<label for="state">State</label>
+										<label for="state"><i class="fas fa-globe-asia"></i> State</label>
 										<!-- <select id="state" multiple="multiple" class="category-menu" size="10" style="width:100%;"> -->
 										<select id="state" class="form-control real-data">
+											<option value="all" style="color:black;">All</option>
 											<?php
 											$stateData = json_decode(file_get_contents('stateData.json'), true);
 											$stateKey = array_keys($stateData);
 											foreach ($stateData as $key => $val) {
 											?>
-												<!-- <option value="" style="color:black;" class="child"></option> -->
 												<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
 											<?php } ?>
 										</select>
 									</div>
 									<div class="col-lg-3">
-										<label for="start-date">Start Date <span id="status-bar-start-date" class="status-bar"></span></label>
+										<label for="start-date"><i class="far fa-calendar-alt"></i> Start Date <span id="status-bar-start-date" class="status-bar"></span></label>
 										<input id="start-date" type="text" class="form-control real-data" readonly>
 									</div>
 									<div class="col-lg-3">
-										<label for="end-date">End Date <span id="status-bar-end-date" class="status-bar"></span></label>
+										<label for="end-date"><i class="far fa-calendar-alt"></i> End Date <span id="status-bar-end-date" class="status-bar"></span></label>
 										<input id="end-date" type="text" class="form-control real-data" readonly>
 									</div>
 									<div class="col-lg-2">
-										<label for="threads">Threads</label>
+										<label for="threads"><i class="fas fa-microchip"></i> Threads</label>
 										<input type="number" id="threads" class="form-control real-data" min="1" max="10" value="4">
 									</div>
 								</div>
@@ -309,8 +308,7 @@
 												<th>Away</th>
 												<th class="text-center">Description</th>
 												<th>Date</th>
-												<th>Gender Sport</th>
-												<th>State</th>
+												<th>Link</th>
 											</tr>
 										</thead>
 									</table>
@@ -633,9 +631,12 @@
 	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js">
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/main.js">
+	<script>
+		localStorage.setItem('state-data', JSON.stringify(<?= json_encode($stateData); ?>))
 	</script>
-	<script type="text/javascript" src="<?php echo $site_url; ?>/js/scripts.min.js"></script>
+	<script type="text/javascript" src="<?= $site_url; ?>/js/script.js">
+	</script>
+	<script type="text/javascript" src="<?= $site_url; ?>/js/scripts.min.js"></script>
 	<?php //include('histats.php'); 
 	?>
 </body>
