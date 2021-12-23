@@ -54,7 +54,7 @@
 				</button>
 			</div>
 			<nav class="collapse navbar-collapse" id="main-navbar">
-				<ul class="nav navbar-nav navbar-right">
+				<ul class="nav navbar-nav navbar-right" style="background-color:#013369;">
 					<?php
 					$topbar = json_decode(file_get_contents('topbar.json'), true);
 					$sportData = json_decode(file_get_contents('sportData.json'), true);
