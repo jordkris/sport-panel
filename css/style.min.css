@@ -75,7 +75,7 @@ h4 {
 }
 
 label {
-    color: #000;
+    color: #fff;
 }
 
 textarea {
@@ -194,8 +194,9 @@ a.nodecor:focus {
 .table>tfoot>tr>th,
 .table>thead>tr>td,
 .table>thead>tr>th {
-    border-color: #333;
-    color: #000;
+    border-color: #888;
+    color: #fff;
+    background-color: #000;
 }
 
 .container {

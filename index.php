@@ -32,7 +32,7 @@
 	<script src="https://kit.fontawesome.com/5e59a4bfec.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" id="simple-css" href="//cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" type="text/css" media="all">
 	<link rel="stylesheet" id="google-font" href="//fonts.googleapis.com/css?family=Oswald|Open+Sans" type="text/css" media="all">
-	<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" type="text/css" media="all">
+	<link rel="stylesheet" href="<?= $site_url; ?>/css/datatables.css" type="text/css" media="all">
 	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" rel="stylesheet" />
 
@@ -188,7 +188,7 @@
 					<div class="entry-content">
 						<div class="row">
 							<div class="col-md-3 text-center hidden-xs hidden-sm">
-								<img id="img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster">
+								<img src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream" width="185" height="278" class="img-responsive inblock main-poster img-desc">
 								<div class="rating-star" title="6.4 out of 10 stars" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
 									<i class="fa fa-star">
 									</i>
@@ -223,13 +223,13 @@
 							<div class="col-md-9">
 								<h3 style="color:#fffefc;margin-top:0;"><?= isset($_GET["match"]) ? htmlspecialchars($_GET["match"]) : 'Match is empty'; ?></h3>
 								<!-- <p class="lead" itemprop="description" style="text-align: justify;">
-									UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch UFC online - Here free and legit !
+									UFC live stream , play-by-play Live Broadcast - UFC live stream. To watch UFC online in best quality as well performance we advice you to use google chrome as browser. You should as well disable Adblock or any adblocker, those are blocking needed resources to start most of the streams. UFC online video and links from international TV Channels - we do our best to provide you with multiples language feeds. Live and Results. Where can I watch `UFC` online - Here free and legit !
 								</p> -->
-								<p id="description" class="lead" itemprop="description" style="text-align: justify;"><?= isset($_GET["match"]) ? 'Loading...' : 'Description is empty'; ?></p>
+								<p id="description" class="lead" itemprop="description" style="text-align: justify;">Watch Sport in Live Broadcast from all over the world. No matter where you are you can always watch your favorite teams play live online. Catch the latest in live Sport entertainment with full access allSport matches! Watch Live Sport Broadcasts & Special Events Emissions Live Online 3000+ PREMIUM TV CHANNELS, 800+ PREMIUM MOVIE CHANNELS, 500+ PREMIUM MUSIC CHANNELS, 1500+ LOCAL TV CHANNELS, COMFORTABLE INTERFACE, NO HARDWARE REQUIRED, 24/7 WORLD-WIDE SUPPORT.</p>
 							</div>
 						</div>
 						<br>
-						<div class="row" style="background-color: white;padding-top:10px;">
+						<div class="row" style="padding-top:10px;">
 							<div class="container">
 								<div class="row" style="margin-bottom: 20px;">
 									<div class="col-lg-2">
@@ -240,7 +240,7 @@
 											<?php
 											foreach ($sportData as $key => $val) {
 											?>
-												<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
+												<option value="<?= strtolower($key); ?>"><?= $val; ?></option>
 											<?php } ?>
 										</select>
 									</div>
@@ -249,13 +249,13 @@
 										<label for="state"><i class="fas fa-globe-asia"></i> State</label>
 										<!-- <select id="state" multiple="multiple" class="category-menu" size="10" style="width:100%;"> -->
 										<select id="state" class="form-control real-data">
-											<option value="all" style="color:black;">All</option>
+											<option value="all">All</option>
 											<?php
 											$stateData = json_decode(file_get_contents('stateData.json'), true);
 											$stateKey = array_keys($stateData);
 											foreach ($stateData as $key => $val) {
 											?>
-												<option value="<?= strtolower($key); ?>" style="color:black;"><?= $val; ?></option>
+												<option value="<?= strtolower($key); ?>"><?= $val; ?></option>
 											<?php } ?>
 										</select>
 									</div>
@@ -274,7 +274,7 @@
 								</div>
 								<div class="row" style="margin-bottom: 20px;">
 									<div class="col-lg-6">
-										<label for="progress-bar-url">URLs <span id="status-bar-url" class="status-bar"></span></label><br />
+										<label for="progress-bar-url"><i class="fas fa-link"></i> URLs <span id="status-bar-url" class="status-bar"></span></label><br />
 										<div id="progress-bar-url" class="progress-bar-striped">
 											<div style="width: 0%;">
 												<p>0%</p>
@@ -283,7 +283,7 @@
 
 									</div>
 									<div class="col-lg-6">
-										<label for="progress-bar-schedule">Schedules <span id="status-bar-schedule" class="status-bar"></span></label><br />
+										<label for="progress-bar-schedule"><i class="far fa-clock"></i> Schedules <span id="status-bar-schedule" class="status-bar"></span></label><br />
 										<div id="progress-bar-schedule" class="progress-bar-striped">
 											<div style="width: 0%;">
 												<p>0%</p>
@@ -291,12 +291,12 @@
 										</div>
 									</div>
 									<div class="col-lg-6">
-										<span style="color:black;float:left;">Status : <span id="status-bar-all"></span></span>
+										<span style="float:left;">Status : <span id="status-bar-all"></span></span>
 										<!-- <button id="start-loading" class="btn btn-success"><i class="icon fa fa-play"></i> Start</button>
 										<button id="stop-loading" class="btn btn-danger" style="display:none;"><i class="icon fa fa-stop"></i> Stop</button> -->
 									</div>
 									<div class="col-lg-6">
-										<span style="color:black;float:right;">Available Schedule : <span id="true-schedule">0</span></span>
+										<span style="float:right;">Available Schedule : <span id="true-schedule">0</span></span>
 									</div>
 								</div>
 								<div class="table-responsive">
@@ -389,12 +389,14 @@
 	<div id="player-modal" class="modal fade nocontext">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x
-				</button>
-				<div class="modal-header text-center"> you must create a free account in order to watch live stream
+				<div class="modal-header text-center"> 
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+					<h3 class="text-center">
+						<strong>you must create a free account in order to watch live stream</strong>
+					</h3>
 				</div>
 				<div class="modal-body">
-					<img class="img-responsive" src="<?= $site_url; ?>/img/ufc.jpg" width="780" height="439" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream">
+					<img class="img-responsive img-desc" src="https://dummyimage.com/768x554/000000/ffffff&text=Loading%20%20%20" width="780" height="439" alt="<?php echo '' . htmlspecialchars($_GET["match"]) . ''; ?> Live Stream">
 					<span class="img-cover">
 					</span>
 					<span class="offerlay ease">

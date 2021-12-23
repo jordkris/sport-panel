@@ -331,7 +331,7 @@ async function loadMetadata(gendersport) {
                     text = '.'.repeat(num) + '%20'.repeat(3 - num);
                     text2 = '.'.repeat(num);
                     $('.img-sport').attr('poster', 'https://dummyimage.com/768x554/000000/ffffff&text=Loading' + text);
-                    $('#img-desc').attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=Loading' + text);
+                    $('.img-desc').attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=Loading' + text);
                     $('.loading-label').html('Loading' + text2);
                 }, 1000);
             },
@@ -344,14 +344,14 @@ async function loadMetadata(gendersport) {
                 if (res.status == 200) {
                     if (res.image != '' && res.image !== null) {
                         $('.img-sport').attr('poster', res.image);
-                        $('#img-desc').attr('src', res.image);
+                        $('.img-desc').attr('src', res.image);
                     } else {
                         $('.img-sport').attr('poster', res.defaultImage);
-                        $('#img-desc').attr('src', res.defaultImage);
+                        $('.img-desc').attr('src', res.defaultImage);
                     }
                 } else {
                     $('.img-sport').attr('poster', 'https://dummyimage.com/768x554/000000/ffffff&text=' + res.message);
-                    $('#img-desc').attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=' + res.message);
+                    $('.img-desc').attr('src', 'https://dummyimage.com/768x554/000000/ffffff&text=' + res.message);
                     handleLog('warning', res.message);
                 }
                 let baseHeight = $('.img-sport')[0].clientHeight;
@@ -388,7 +388,6 @@ async function abortExecution(force = true) {
                 } else {
                     alert('Match not found!');
                     $('#status-bar-all').html(handleIcon('empty') + ' Match not found!');
-                    $('p#description').html(handleIcon('empty') + ' Match not found!');
                 }
             }
             handleProgressBar('#progress-bar-url', 0, 1);
@@ -787,7 +786,7 @@ function handleLog(status, message) {
     if (status == 'success') {
         $('#loading-log').prepend(`<li style="color:green;"><small>${datetime}</small><div>${message}</div></li>`);
     } else if (status == 'info') {
-        $('#loading-log').prepend(`<li style="color:black;"><small>${datetime}</small><div>${message}</div></li>`);
+        $('#loading-log').prepend(`<li style="color:#fff;"><small>${datetime}</small><div>${message}</div></li>`);
     } else if (status == 'warning') {
         $('#loading-log').prepend(`<li style="color: darkgoldenrod;"><small>${datetime}</small><div>${message}</div></li>`);
     } else if (status == 'error') {
@@ -828,6 +827,11 @@ function handleLinkTeams(r) {
         <ol>
             <a href="${location.href.split('?')[0]}?gendersport=${r.gendersport}&match=${replaceWithPlus(r.data.away + ' vs ' + r.data.home)}" class="btn btn-info">
                 <i class="icon fa fa-external-link-alt"></i> Alternative 2
+            </a>
+        </ol>
+        <ol>
+            <a href="${r.data.url}" target="_blank" class="btn btn-warning">
+                <i class="icon fa fa-external-link-alt"></i> Source
             </a>
         </ol>
     </ul>`;
@@ -895,7 +899,7 @@ function handleIcon(icon) {
     let res;
     switch (icon) {
         case 'loading':
-            $('#status-bar-all').css('color', 'black');
+            $('#status-bar-all').css('color', '#fff');
             res = '<i class="icon fa fa-spinner fa-pulse"></i>';
             break;
         case 'abort':
